@@ -1,0 +1,53 @@
+[gd_scene load_steps=8 format=3 uid="uid://dgxx14e0a70y8"]
+
+[ext_resource type="Script" path="res://Project/Scripts/GameManager.cs" id="1_ljtia"]
+[ext_resource type="Script" path="res://Project/Scripts/entity/Player.cs" id="2_3od5f"]
+[ext_resource type="Script" path="res://Project/Scripts/CameraFollow.cs" id="3_wfu4e"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_gr2p5"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ow7lw"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_8houp"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_aglb2"]
+size = Vector3(1, 0.915039, 1)
+
+[node name="GameRoot" type="Node3D"]
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("1_ljtia")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.38998, 0)
+script = ExtResource("2_3od5f")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("CapsuleMesh_gr2p5")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_ow7lw")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+script = ExtResource("3_wfu4e")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00182509, 3.68802, 0)
+light_energy = 0.16
+light_indirect_energy = 11.21
+light_volumetric_fog_energy = 31.875
+light_size = 73.71
+light_specular = 2.585
+omni_range = 18.3737
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+transform = Transform3D(12.1772, 0, 0, 0, 0.410299, 0, 0, 0, 13.5173, 0, 0, 0)
+mesh = SubResource("BoxMesh_8houp")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Node3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/StaticBody3D"]
+transform = Transform3D(32.2419, 0, 0, 0, 1, 0, 0, 0, 46.3532, 0, -0.0424805, 0)
+shape = SubResource("BoxShape3D_aglb2")
