@@ -11,7 +11,7 @@ public partial class Player : CharacterBody3D
 
     public override void _Ready()
     {
-        GlobalPosition = new Vector3(1.5f, 5f, 1.5f); // Position initiale
+        GlobalPosition = new Vector3(1.5f, 30f, 1.5f); // Position initiale
         SetPhysicsProcess(true); // Active la physique
 
         // Trouver la caméra dans la hiérarchie de la scène

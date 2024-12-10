@@ -16,7 +16,6 @@
 script = ExtResource("1_ljtia")
 
 [node name="Player" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.38998, 0)
 script = ExtResource("2_3od5f")
 
 [node name="PlayerShape" type="MeshInstance3D" parent="Player"]
@@ -26,7 +25,7 @@ mesh = SubResource("CapsuleMesh_gr2p5")
 shape = SubResource("CapsuleShape3D_ow7lw")
 
 [node name="DirectionShape" type="MeshInstance3D" parent="Player"]
-transform = Transform3D(0.167977, 0, 0, 0, 0.167977, 0, 0, 0, 1, 0, 0.541025, 0.403704)
+transform = Transform3D(0.167977, 0, 0, 0, 0.167977, 0, 0, 0, 1, 0, 0.541025, -0.687579)
 mesh = SubResource("BoxMesh_xu1we")
 
 [node name="Camera" type="Camera3D" parent="."]

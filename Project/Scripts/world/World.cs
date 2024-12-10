@@ -8,7 +8,7 @@ public partial class World : Node
 
     public int Width, Height, Depth;
 
-    public World(int width, int height, int depth)
+    public World(int width, int height, int depth) : base()
     {
         Width = width;
         Height = height;
@@ -28,8 +28,10 @@ public partial class World : Node
 
     public override void _Ready()
     {
-        EmptyWorld();
+        ProceduralWorldGenerator generator = new ProceduralWorldGenerator(0.05f, 0.5f, seed: 42);
+        generator.Generate(this);
     }
+
 
     /**
      * Single block methods
@@ -59,6 +61,7 @@ public partial class World : Node
         if (!IsBlockInWorld(x, y, z))
             return false; // No Set : out of world
         _blocks[GetIndex(x, y, z)] = block;
+        AddChild(block);
         return true;
     }
 
@@ -74,6 +77,7 @@ public partial class World : Node
         if (!IsBlockInWorld(x, y, z))
             return false; // No remove : out of world
         _blocks[GetIndex(x, y, z)] = new Void(new Vector3I(x, y, z));
+        RemoveChild(GetBlock(x, y, z));
         return true;
     }
 
