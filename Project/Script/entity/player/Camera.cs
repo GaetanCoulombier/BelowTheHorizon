@@ -44,7 +44,6 @@ public partial class Camera : Camera3D
     public override void _UnhandledInput(InputEvent @event)
     {
         HandleMouseInput(@event);
-        HandleCursorToggle(@event);
     }
 
     private void HandleMouseInput(InputEvent @event)
@@ -58,17 +57,6 @@ public partial class Camera : Camera3D
 
             // Clamp the vertical rotation angle to prevent the camera from flipping
             _rotation.X = Mathf.Clamp(_rotation.X, -_maxVerticalAngle, _maxVerticalAngle);
-        }
-    }
-
-    // TODO : Replace this method with the pause menu
-    private void HandleCursorToggle(InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed && keyEvent.Keycode == Key.Escape)
-        {
-            Input.MouseMode = Input.MouseMode == Input.MouseModeEnum.Captured
-                ? Input.MouseModeEnum.Visible
-                : Input.MouseModeEnum.Captured;
         }
     }
 }

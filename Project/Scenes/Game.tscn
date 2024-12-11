@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://dgxx14e0a70y8"]
+[gd_scene load_steps=6 format=3 uid="uid://dgxx14e0a70y8"]
 
-[ext_resource type="Script" path="res://Project/Scripts/GameManager.cs" id="1_ljtia"]
+[ext_resource type="Script" path="res://Project/Script/GameManager.cs" id="1_ljtia"]
 [ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Scenes/Entity/Player.tscn" id="3_2eokk"]
+[ext_resource type="PackedScene" uid="uid://dl6irgcvodwx7" path="res://Project/Scenes/UserInterface/InputSettings.tscn" id="3_s8lgb"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_padwm"]
 
@@ -11,9 +12,6 @@
 
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("1_ljtia")
-
-[node name="Player" parent="." instance=ExtResource("3_2eokk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.18471, 0)
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 
@@ -25,3 +23,9 @@ shape = SubResource("BoxShape3D_padwm")
 layers = 17
 mesh = SubResource("BoxMesh_mklb8")
 skeleton = NodePath("../../..")
+
+[node name="Player" parent="." instance=ExtResource("3_2eokk")]
+
+[node name="GUI" type="CanvasLayer" parent="."]
+
+[node name="InputSettings" parent="GUI" instance=ExtResource("3_s8lgb")]

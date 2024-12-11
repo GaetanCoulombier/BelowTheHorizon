@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bmysmn7828o6k"]
 
-[ext_resource type="Script" path="res://Project/Scripts/entity/player/Player.cs" id="1_i8kcu"]
-[ext_resource type="Script" path="res://Project/Scripts/entity/player/Camera.cs" id="2_25ecb"]
+[ext_resource type="Script" path="res://Project/Script/entity/player/Player.cs" id="1_mmquc"]
+[ext_resource type="Script" path="res://Project/Script/entity/player/Camera.cs" id="2_78pcn"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0ojva"]
 
@@ -10,7 +10,7 @@
 [sub_resource type="CylinderMesh" id="CylinderMesh_m7xi6"]
 
 [node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_i8kcu")
+script = ExtResource("1_mmquc")
 
 [node name="PlayerCollisionBox" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_0ojva")
@@ -24,11 +24,11 @@ transform = Transform3D(0.285045, 0, 0, 0, -2.27215e-09, -0.285045, 0, 0.0519808
 mesh = SubResource("CylinderMesh_m7xi6")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="PlayerFrontLight"]
-transform = Transform3D(3.50821, 0, 0, 0, -1.6517e-07, 19.1866, 0, -3.77864, -8.38673e-07, 0, 0, 0)
+transform = Transform3D(3.50822, 0, 0, 0, -1.53349e-07, 19.2379, 0, -3.50822, -2.79648e-08, 0, 16.5685, -1.19209e-07)
 light_energy = 1.906
 spot_range = 5.63462
-spot_angle = 51.8281
+spot_angle = 39.4071
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1626, 2.14563)
-script = ExtResource("2_25ecb")
+script = ExtResource("2_78pcn")
