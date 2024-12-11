@@ -7,6 +7,7 @@ public partial class InputSettings : Control
     private PackedScene _inputButtonScene;
     private Control _actionList;
 
+    private bool _isRemapping = false;
     private InputButton _remappingButton = null;
     private string _remappingAction = null;
 
@@ -70,11 +71,11 @@ public partial class InputSettings : Control
 
     private void OnRemapRequested(InputButton button)
     {
-        if (GlobalState.IsRemapping)
+        if (_isRemapping)
             return;
 
         // Début du remapping
-        GlobalState.IsRemapping = true;
+        _isRemapping = true;
         _remappingButton = button;
         _remappingAction = GetKeyByValue(_allowRemapActions, button.GetActionLabel()); // We need to get the same name than the godot InputMap action
 
@@ -85,7 +86,7 @@ public partial class InputSettings : Control
     public override void _Input(InputEvent @event)
     {
         // Vérify if we are remapping and if the event is a key or mouse button
-        if (!GlobalState.IsRemapping || @event is not InputEventKey && @event is not InputEventMouseButton)
+        if (!_isRemapping || @event is not InputEventKey && @event is not InputEventMouseButton)
             return;
 
 
@@ -109,9 +110,12 @@ public partial class InputSettings : Control
         _remappingButton.UpdateInputLabel(inputName);
 
         // End of remapping
-        GlobalState.IsRemapping = false;
+        _isRemapping = false;
         _remappingButton = null;
         _remappingAction = null;
+        
+        // Stop the event propagation
+        AcceptEvent();
 
         // Save the new configuration
         SaveProjectSettings();

@@ -9,17 +9,16 @@ public partial class GameManager : Node
     public override void _Ready()
     {
         _inputSettingsMenu = GetNode<Control>("/root/GameRoot/GUI/InputSettings");
-        
-        GD.Print(_inputSettingsMenu);
 
         // Hide the mouse cursor
         Input.MouseMode = Input.MouseModeEnum.Captured;
         _inputSettingsMenu.Visible = false;
     }
 
+    // GUI input handling
     public override void _Input(InputEvent @event)
     {
-        if(@event.IsActionPressed("pause_menu") && !GlobalState.IsRemapping)
+        if(@event.IsActionPressed("pause_menu"))
         {
             TogglePauseMenu();
         }// ...
