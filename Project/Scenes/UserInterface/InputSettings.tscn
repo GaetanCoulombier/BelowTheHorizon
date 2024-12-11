@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dl6irgcvodwx7"]
+[gd_scene load_steps=4 format=3 uid="uid://dl6irgcvodwx7"]
 
 [ext_resource type="Script" path="res://Project/Script/gui/pause/InputSettings.cs" id="1_2cvxd"]
 [ext_resource type="PackedScene" uid="uid://cbfpfugw7xxmt" path="res://Project/Scenes/UserInterface/InputButton.tscn" id="1_07dg3"]
+[ext_resource type="FontFile" uid="uid://dva03ei3yvboa" path="res://Project/Fonts/PixelSplitter-Bold.ttf" id="3_vjore"]
 
 [node name="InputSettings" type="Control"]
 layout_mode = 3
@@ -46,3 +47,10 @@ size_flags_horizontal = 3
 
 [node name="InputButton" parent="PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ActionList" instance=ExtResource("1_07dg3")]
 layout_mode = 2
+
+[node name="ResetButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("3_vjore")
+theme_override_font_sizes/font_size = 24
+text = "Reset to default"

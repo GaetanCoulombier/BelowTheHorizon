@@ -30,6 +30,9 @@ public partial class InputSettings : Control
     {
         _actionList = GetNode<Control>("/root/GameRoot/GUI/InputSettings/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ActionList");
         _inputButtonScene = ResourceLoader.Load<PackedScene>("res://Project/Scenes/UserInterface/InputButton.tscn");
+        var _restButton = GetNode<Button>("/root/GameRoot/GUI/InputSettings/PanelContainer/MarginContainer/VBoxContainer/ResetButton");
+
+        _restButton.Connect("pressed", new Callable(this, nameof(OnResetButtonPressed)));
 
         CreateActionList();
     }
@@ -112,6 +115,11 @@ public partial class InputSettings : Control
 
         // Save the new configuration
         SaveProjectSettings();
+    }
+
+    private void OnResetButtonPressed()
+    {
+        CreateActionList();
     }
 
 
