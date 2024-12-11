@@ -65,11 +65,11 @@ public class PlayerMovementHandler
     {
         Vector3 inputVector = Vector3.Zero;
 
-        if (Input.IsActionPressed("Move_Forward")) inputVector.Z -= 1;
-        if (Input.IsActionPressed("Move_Backward")) inputVector.Z += 1;
-        if (Input.IsActionPressed("Move_Left")) inputVector.X -= 1;
-        if (Input.IsActionPressed("Move_Right")) inputVector.X += 1;
-        if (Input.IsActionJustPressed("Jump") && _player.IsOnFloor()) _velocity.Y = _jumpStrength;
+        if (Input.IsActionPressed("move_forward")) inputVector.Z -= 1;
+        if (Input.IsActionPressed("move_backward")) inputVector.Z += 1;
+        if (Input.IsActionPressed("move_left")) inputVector.X -= 1;
+        if (Input.IsActionPressed("move_right")) inputVector.X += 1;
+        if (Input.IsActionJustPressed("jump") && _player.IsOnFloor()) _velocity.Y = _jumpStrength;
 
         // Normalize the input vector to prevent faster diagonal movement
         return inputVector.Normalized();

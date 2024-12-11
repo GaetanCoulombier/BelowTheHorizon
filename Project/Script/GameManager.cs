@@ -19,21 +19,27 @@ public partial class GameManager : Node
 
     public override void _Input(InputEvent @event)
     {
-        if(@event.IsActionPressed("Pause_Menu"))
+        if(@event.IsActionPressed("pause_menu") && !GlobalState.IsRemapping)
         {
-            GD.Print("Pause Menu");
-            if (_inputSettingsMenu.Visible)
-            {
-                Input.MouseMode = Input.MouseModeEnum.Captured;
-                _inputSettingsMenu.Visible = false;
-                Engine.TimeScale = 1;
-            }
-            else
-            {
-                Input.MouseMode = Input.MouseModeEnum.Visible;
-                _inputSettingsMenu.Visible = true;
-                Engine.TimeScale = 0;
-            }
+            TogglePauseMenu();
+        }// ...
+    }
+
+    private void TogglePauseMenu()
+    {
+        if (GlobalState.IsPaused)
+        {
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+            _inputSettingsMenu.Visible = false;
+            Engine.TimeScale = 1;
         }
+        else
+        {
+            Input.MouseMode = Input.MouseModeEnum.Visible;
+            _inputSettingsMenu.Visible = true;
+            Engine.TimeScale = 0;
+        }
+
+        GlobalState.IsPaused = !GlobalState.IsPaused;
     }
 }

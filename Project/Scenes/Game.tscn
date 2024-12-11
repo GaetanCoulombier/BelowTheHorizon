@@ -25,6 +25,7 @@ mesh = SubResource("BoxMesh_mklb8")
 skeleton = NodePath("../../..")
 
 [node name="Player" parent="." instance=ExtResource("3_2eokk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.18471, 0)
 
 [node name="GUI" type="CanvasLayer" parent="."]
 
