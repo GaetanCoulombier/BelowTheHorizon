@@ -1,41 +1,27 @@
-[gd_scene load_steps=7 format=3 uid="uid://dgxx14e0a70y8"]
+[gd_scene load_steps=5 format=3 uid="uid://dgxx14e0a70y8"]
 
 [ext_resource type="Script" path="res://Project/Scripts/GameManager.cs" id="1_ljtia"]
-[ext_resource type="Script" path="res://Project/Scripts/entity/Player.cs" id="2_3od5f"]
-[ext_resource type="Script" path="res://Project/Scripts/Camera.cs" id="3_cr0qv"]
+[ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Scenes/Entity/Player.tscn" id="3_2eokk"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_gr2p5"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_padwm"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ow7lw"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_xu1we"]
+[sub_resource type="BoxMesh" id="BoxMesh_mklb8"]
 
 [node name="GameRoot" type="Node3D"]
 
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("1_ljtia")
 
-[node name="Player" type="CharacterBody3D" parent="."]
-script = ExtResource("2_3od5f")
+[node name="Player" parent="." instance=ExtResource("3_2eokk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.18471, 0)
 
-[node name="PlayerShape" type="MeshInstance3D" parent="Player"]
-mesh = SubResource("CapsuleMesh_gr2p5")
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-shape = SubResource("CapsuleShape3D_ow7lw")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(14.2662, 0, 0, 0, 0.369417, 0, 0, 0, 14.2662, 0, 0, 0)
+shape = SubResource("BoxShape3D_padwm")
 
-[node name="DirectionShape" type="MeshInstance3D" parent="Player"]
-transform = Transform3D(0.167977, 0, 0, 0, 0.167977, 0, 0, 0, 1, 0, 0.541025, -0.687579)
-mesh = SubResource("BoxMesh_xu1we")
-
-[node name="Camera" type="Camera3D" parent="."]
-script = ExtResource("3_cr0qv")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00182509, 3.68802, 0)
-light_energy = 0.16
-light_indirect_energy = 11.21
-light_volumetric_fog_energy = 31.875
-light_size = 73.71
-light_specular = 2.585
-omni_range = 18.3737
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D/CollisionShape3D"]
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+skeleton = NodePath("../../..")

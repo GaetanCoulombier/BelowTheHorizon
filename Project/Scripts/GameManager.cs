@@ -1,15 +1,14 @@
 using Godot;
 using System;
 
+// This script is used to manage the game, such as the player, enemies, and other game objects.
 public partial class GameManager : Node
 {
-    private World _world;
     private CharacterBody3D _player;
 
     public override void _Ready()
     {
-        // Initialisation de la grille
-        _world = new World(20, 20, 20);
-        AddChild(_world);
+        _player = GetNode<CharacterBody3D>("/root/GameRoot/Player");
+        GD.Print(_player.GetChildren());
     }
 }
