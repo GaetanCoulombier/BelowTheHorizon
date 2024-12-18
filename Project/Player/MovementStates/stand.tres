@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://duewlpwywftgt"]
+
+[ext_resource type="Script" path="res://Project/Player/MovementState.cs" id="1_noomg"]
+
+[resource]
+script = ExtResource("1_noomg")
+Id = 0
+MovementSpeed = 0.0
+Acceleration = 6.0
+CameraFov = 70.0
+AnimationSpeed = 1.0
