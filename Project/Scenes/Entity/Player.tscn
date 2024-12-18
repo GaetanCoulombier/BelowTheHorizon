@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=5 format=3 uid="uid://bmysmn7828o6k"]
 
 [ext_resource type="Script" path="res://Project/Script/entity/player/Player.cs" id="1_mmquc"]
 [ext_resource type="Script" path="res://Project/Script/entity/player/Camera.cs" id="2_78pcn"]
@@ -6,10 +6,6 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0ojva"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7rhqp"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_m7xi6"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_ifi1a"]
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_mmquc")
@@ -21,12 +17,8 @@ shape = SubResource("CapsuleShape3D_0ojva")
 mesh = SubResource("CapsuleMesh_7rhqp")
 skeleton = NodePath("")
 
-[node name="PlayerFrontLight" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.285045, 0, 0, 0, -2.27215e-09, -0.285045, 0, 0.0519808, -1.24597e-08, 0, 0.195, -0.506)
-mesh = SubResource("CylinderMesh_m7xi6")
-
-[node name="SpotLight3D" type="SpotLight3D" parent="PlayerFrontLight"]
-transform = Transform3D(3.50822, 0, 0, 0, -1.53349e-07, 19.2379, 0, -3.50822, -2.79648e-08, 0, 16.5685, -1.19209e-07)
+[node name="PocketLight" type="SpotLight3D" parent="PlayerCollisionBox/PlaceHolderMesh"]
+transform = Transform3D(1, 0, 0, 0, 1, -3.57401e-08, 0, 3.57401e-08, 1, 0, 0.195, -0.0760014)
 light_energy = 1.906
 spot_range = 5.63462
 spot_angle = 39.4071
@@ -35,16 +27,59 @@ spot_angle = 39.4071
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1626, 2.14563)
 script = ExtResource("2_78pcn")
 
-[node name="RayCastFacingWall" type="RayCast3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.394, 0)
-target_position = Vector3(0, -2.5, 0)
+[node name="ClimbingNode" type="Node3D" parent="."]
 
-[node name="RaycastLedgeChecker" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3, 0)
+[node name="FrontRight" type="Node3D" parent="ClimbingNode"]
 
-[node name="RayCastHead" type="RayCast3D" parent="RaycastLedgeChecker"]
-target_position = Vector3(0, -10, 0)
+[node name="RayCastDown" type="RayCast3D" parent="ClimbingNode/FrontRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.45, 0.3, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
 
-[node name="LedgeMarker" type="MeshInstance3D" parent="RaycastLedgeChecker/RayCastHead"]
-transform = Transform3D(0.244764, 0, 0, 0, 0.244764, 0, 0, 0, 0.244764, 0, 0, 0)
-mesh = SubResource("SphereMesh_ifi1a")
+[node name="RayCastUp" type="RayCast3D" parent="ClimbingNode/FrontRight"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0.45, 0.4, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
+
+[node name="FrontLeft" type="Node3D" parent="ClimbingNode"]
+
+[node name="RayCastDown" type="RayCast3D" parent="ClimbingNode/FrontLeft"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, -0.45, 0.3, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
+
+[node name="RayCastUp" type="RayCast3D" parent="ClimbingNode/FrontLeft"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, -0.45, 0.4, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
+
+[node name="FrontMiddle" type="Node3D" parent="ClimbingNode"]
+
+[node name="RayCastDown" type="RayCast3D" parent="ClimbingNode/FrontMiddle"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.3, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
+
+[node name="RayCastUp" type="RayCast3D" parent="ClimbingNode/FrontMiddle"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.4, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3
+
+[node name="Side" type="Node3D" parent="ClimbingNode"]
+
+[node name="RayCastRight" type="RayCast3D" parent="ClimbingNode/Side"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00533986, 0.299623, -0.45)
+target_position = Vector3(1.5, 0, 0)
+debug_shape_custom_color = Color(0, 1, 0, 1)
+debug_shape_thickness = 3
+
+[node name="RayCastLeft" type="RayCast3D" parent="ClimbingNode/Side"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00533986, 0.299623, -0.45)
+target_position = Vector3(-1.5, 0, 0)
+debug_shape_custom_color = Color(0, 1, 0, 1)
+debug_shape_thickness = 3
+
+[node name="RayCastFacingWall" type="RayCast3D" parent="ClimbingNode"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+target_position = Vector3(0, -1.5, 0)
+debug_shape_thickness = 3

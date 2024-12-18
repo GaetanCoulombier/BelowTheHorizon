@@ -17,11 +17,10 @@ public class InputHandler
     {
         //if (IsClimbUpPressed()) _climbingHandler.ClimbUp();
         if (_climbingHandler.IsHanging) {
-            if (IsCrouchPressed()) _climbingHandler.DropDown();
-            else if (IsMoveLeftPressed()) _climbingHandler.MoveAlongLedge(-1);
-            else if (IsMoveRightPressed()) _climbingHandler.MoveAlongLedge(1);
-        } else {
-            if (IsInteractPressed()) _climbingHandler.GrabLedge();
+            if (IsMoveBackwardPressed()) _climbingHandler.DropDown();
+            else if (IsMoveForwardPressed()) _climbingHandler.ClimbUp();
+            else if (IsMoveLeftPressed()) _climbingHandler.MoveAlongLedge((int) ClimbingDirection.Left);
+            else if (IsMoveRightPressed()) _climbingHandler.MoveAlongLedge((int) ClimbingDirection.Right);
         }
     }
 
