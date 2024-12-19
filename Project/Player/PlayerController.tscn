@@ -1,8 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=6 format=3 uid="uid://bmysmn7828o6k"]
 
+[ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
-[ext_resource type="Script" path="res://Project/Player/Player.cs" id="1_x60bg"]
-[ext_resource type="Script" path="res://Project/Player/MovementController.cs" id="3_ya3b1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0ojva"]
 
@@ -11,8 +10,8 @@
 [sub_resource type="SphereShape3D" id="SphereShape3D_5ytvo"]
 radius = 0.1
 
-[node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_x60bg")
+[node name="PlayerController" type="CharacterBody3D"]
+script = ExtResource("1_ta7j4")
 
 [node name="PlayerCollisionBox" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_0ojva")
@@ -37,12 +36,6 @@ debug_shape_thickness = 3
 mesh = SubResource("CapsuleMesh_7rhqp")
 skeleton = NodePath("")
 
-[node name="PocketLight" type="SpotLight3D" parent="MeshRoot/PlaceHolderMesh"]
-transform = Transform3D(1, 0, 0, 0, 1, -3.57401e-08, 0, 3.57401e-08, 1, 0, 0.195, -0.0760014)
-light_energy = 1.906
-spot_range = 5.63462
-spot_angle = 39.4071
-
 [node name="CamRoot" type="Node3D" parent="."]
 script = ExtResource("1_un8fh")
 
@@ -55,6 +48,3 @@ shape = SubResource("SphereShape3D_5ytvo")
 spring_length = 4.0
 
 [node name="Camera3D" type="Camera3D" parent="CamRoot/CamYaw/CamPitch/SpringArm3D"]
-
-[node name="MovementController" type="Node" parent="."]
-script = ExtResource("3_ya3b1")

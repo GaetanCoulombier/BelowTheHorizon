@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://dgxx14e0a70y8"]
 
 [ext_resource type="Script" path="res://Project/Game/GameManager.cs" id="1_tm8su"]
-[ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Player/Player.tscn" id="3_2eokk"]
+[ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Player/PlayerController.tscn" id="3_2eokk"]
 [ext_resource type="PackedScene" uid="uid://dl6irgcvodwx7" path="res://Project/UserInterfaces/PauseMenu/InputSettings.tscn" id="3_s8lgb"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_mklb8"]
@@ -19,13 +19,12 @@ sky_mode = 1
 [node name="GameManager" type="Node" parent="."]
 script = ExtResource("1_tm8su")
 
-[node name="Player" parent="." instance=ExtResource("3_2eokk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2239, 0)
+[node name="PlayerController" parent="." instance=ExtResource("3_2eokk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22462, 0)
 
 [node name="GUI" type="CanvasLayer" parent="."]
 
 [node name="InputSettings" parent="GUI" instance=ExtResource("3_s8lgb")]
-script = null
 
 [node name="Sol" type="MeshInstance3D" parent="."]
 transform = Transform3D(24.697, 0, 0, 0, 0.449246, 0, 0, 0, 24.697, 0, 0, 0)
