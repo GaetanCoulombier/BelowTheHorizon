@@ -41,7 +41,7 @@ public abstract class MovementState
     //public static MovementState HANG = new HangState();
 
     // Swimming
-    //public static MovementState SWIM = new SwimState();
+    public static MovementState SWIM = new SwimState();
 }
 
 public enum MovementType

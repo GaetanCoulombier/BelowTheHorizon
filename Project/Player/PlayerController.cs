@@ -11,12 +11,17 @@ public partial class PlayerController : CharacterBody3D
     private MovementController _movementController; // Handling movement and physics
 
     /* Movement configuration */
-    public MovementState movementState = MovementState.WALK;
-    public MovementType movementType = MovementType.GROUND;
+    public MovementState movementState { get; private set; } = MovementState.WALK;
+    public MovementType movementType { get; private set; } = MovementType.GROUND;
+
+    /* Signals */
+    [Signal] public delegate void SetMovementStateEventHandler();
+    [Signal] public delegate void SetMovementTypeEventHandler();
+
 
     public override void _Ready()
     {
-        _camera = GetNode<Camera3D>("CamRoot/CamYaw/CamPitch/SpringArm3D/Camera3D");
+        _camera = GetNode<Camera3D>("CamRoot/SpringArm3D/Camera3D");
 
         _movementController = new MovementController(this, _camera);
         _detectionController = new DetectionController(this);
@@ -26,7 +31,6 @@ public partial class PlayerController : CharacterBody3D
     {
         /* -- Test the player movement type -- */
         _detectionController.Handle(delta);
-
 
         /* -- Handle the player input for all possible movement types -- */
         if (movementType == MovementType.GROUND){
@@ -38,10 +42,12 @@ public partial class PlayerController : CharacterBody3D
             if (Input.IsActionPressed("sprint")) movementState = MovementState.RUN;
             if (Input.IsActionJustReleased("sprint")) movementState = MovementState.WALK;
 
+            // Gravity
+            _movementController.OnFall(delta);
+
             // Movements
             if (Input.IsActionJustPressed("jump")) _movementController.OnJump();
             _movementController.OnInputChanged(CalculateMoveDirectionFromInputs());
-            _movementController.OnFall(delta);
         }
         else if (movementType == MovementType.CLIMBING)
         {
@@ -49,11 +55,13 @@ public partial class PlayerController : CharacterBody3D
         }
         else if (movementType == MovementType.SWIMMING)
         {
+            movementState = MovementState.SWIM;
             // Handle swimming input
         }
 
 
         /* -- Apply movement -- */
+        _movementController.OnInputChanged(CalculateMoveDirectionFromInputs());
         _movementController.Handle(delta, CalculateMoveDirectionFromInputs());
     }
 
@@ -73,9 +81,19 @@ public partial class PlayerController : CharacterBody3D
                 movement += axis;
             }
         }
-        
-        GD.Print(movement);
 
         return movement.Normalized();
+    }
+
+    public void SetMovementType(MovementType type)
+    {
+        movementType = type;
+        EmitSignal(nameof(SetMovementTypeHandler));
+    }
+
+    public void SetMovementState(MovementState state)
+    {
+        movementState = state;
+        EmitSignal(nameof(SetMovementStateEventHandler));
     }
 }

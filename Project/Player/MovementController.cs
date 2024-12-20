@@ -7,7 +7,7 @@ public partial class MovementController
     private float _jumpForce = 5.0f;
 
     private Vector3 _velocity = Vector3.Zero;
-    private Vector3 _lastInputDirection = Vector3.Zero;
+    
 
 
     private PlayerController _playerController;
@@ -17,15 +17,19 @@ public partial class MovementController
     {
         this._playerController = playerController;
         _camera = camera;
+
+        _playerController.Connect(nameof(PlayerController.SetMovementStateEventHandler), this, nameof(OnMovementStateChange));
     }
 
     public void Handle(double delta, Vector3 direction)
     {
+        // camera
+        AlignPlayerToCamera();
+
+
+        // movement
         _playerController.Velocity = _velocity;
         _playerController.MoveAndSlide();
-
-        // Camera
-        //AlignPlayerToCamera();
     }
 
 
@@ -35,22 +39,30 @@ public partial class MovementController
     public void OnInputChanged(Vector3 direction)
     {
         Vector3 possibleDirections = _playerController.movementState.PossibleDirections;
+        Vector3 currentVelocity = _velocity;
+
+        GD.Print("Direction: " + direction);
+        GD.Print("Possible Directions: " + possibleDirections);
         
         if (direction == Vector3.Zero || possibleDirections == Vector3.Zero)
-        {   
-            _velocity = Vector3.Zero;
+        {
+            var inverse = new Vector3(1 - possibleDirections.X, 1 - possibleDirections.Y, 1 - possibleDirections.Z);
+            _velocity *= inverse;
             return;
         }
 
-        Vector3 movement = direction * possibleDirections * _playerController.movementState.MovementSpeed;
-
-        // Camera relative movement
         Basis cameraBasis = _camera.GlobalTransform.Basis;
-        cameraBasis = new Basis(cameraBasis.X, Vector3.Up, cameraBasis.Z);
-        Vector3 globalMovement = cameraBasis * movement;
+        Vector3 forward = cameraBasis.Z.Normalized();
+        Vector3 right = cameraBasis.X.Normalized();
+        Vector3 up = cameraBasis.Y.Normalized();
 
-        // Update the player's velocity
-        _velocity = direction * globalMovement;
+        Vector3 movement = (right * direction.X + up * direction.Y + forward * direction.Z).Normalized();
+        movement *= possibleDirections;
+
+        // Appliquer la vitesse
+        if (possibleDirections.X == 1) _velocity.X = movement.X * _playerController.movementState.MovementSpeed;
+        if (possibleDirections.Y == 1) _velocity.Y = movement.Y * _playerController.movementState.MovementSpeed;
+        if (possibleDirections.Z == 1) _velocity.Z = movement.Z * _playerController.movementState.MovementSpeed;
     }
 
     public void OnJump()
@@ -62,16 +74,23 @@ public partial class MovementController
     }
 
     public void OnFall(double delta)
+{
+    if (_playerController.IsOnFloor())
     {
-        if (!_playerController.IsOnFloor()) _velocity.Y += _gravity * (float)delta;
-        else _velocity.Y = 0;
+        _velocity.Y = 0;
     }
+    else
+    {
+        _velocity.Y += _gravity * (float)delta;
+    }
+}
+
 
 
 
 
     /* Camera */
-    private void AlignPlayerToCamera()
+    public void AlignPlayerToCamera()
     {
         Vector3 directionToCamera = _camera.GlobalPosition - _playerController.GlobalTransform.Origin;
         directionToCamera.Y = 0;

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=7 format=3 uid="uid://bmysmn7828o6k"]
 
 [ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
@@ -7,8 +7,10 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7rhqp"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_5ytvo"]
-radius = 0.1
+[sub_resource type="BoxMesh" id="BoxMesh_q0pwf"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_skskm"]
+radius = 0.07
 
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1_ta7j4")
@@ -36,15 +38,15 @@ debug_shape_thickness = 3
 mesh = SubResource("CapsuleMesh_7rhqp")
 skeleton = NodePath("")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshRoot"]
+transform = Transform3D(0.672541, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, -0.535852)
+mesh = SubResource("BoxMesh_q0pwf")
+
 [node name="CamRoot" type="Node3D" parent="."]
 script = ExtResource("1_un8fh")
 
-[node name="CamYaw" type="Node3D" parent="CamRoot"]
-
-[node name="CamPitch" type="Node3D" parent="CamRoot/CamYaw"]
-
-[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot/CamYaw/CamPitch"]
-shape = SubResource("SphereShape3D_5ytvo")
+[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot"]
+shape = SubResource("SphereShape3D_skskm")
 spring_length = 4.0
 
-[node name="Camera3D" type="Camera3D" parent="CamRoot/CamYaw/CamPitch/SpringArm3D"]
+[node name="Camera3D" type="Camera3D" parent="CamRoot/SpringArm3D"]
