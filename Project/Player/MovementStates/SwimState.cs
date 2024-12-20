@@ -1,5 +1,5 @@
 
-public class SwimState : SwimMovementState
+public partial class SwimState : SwimMovementState
 {
     public SwimState() {
         MovementSpeed = 4.0f;

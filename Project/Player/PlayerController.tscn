@@ -22,13 +22,13 @@ shape = SubResource("CapsuleShape3D_0ojva")
 
 [node name="RayCastFacingWall" type="RayCast3D" parent="DetectionsRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.347438, 0)
-target_position = Vector3(0, 0, -1)
+target_position = Vector3(0, 0, 1)
 debug_shape_custom_color = Color(0, 1, 0, 1)
 debug_shape_thickness = 3
 
 [node name="RayCastClimbUp" type="RayCast3D" parent="DetectionsRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0616078, 0)
-target_position = Vector3(0, 0, -1)
+target_position = Vector3(0, 0, 1)
 debug_shape_custom_color = Color(1, 0, 1, 1)
 debug_shape_thickness = 3
 
@@ -39,7 +39,7 @@ mesh = SubResource("CapsuleMesh_7rhqp")
 skeleton = NodePath("")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MeshRoot"]
-transform = Transform3D(0.672541, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, -0.535852)
+transform = Transform3D(0.672541, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, 0.456394)
 mesh = SubResource("BoxMesh_q0pwf")
 
 [node name="CamRoot" type="Node3D" parent="."]

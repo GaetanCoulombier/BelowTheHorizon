@@ -1,100 +1,104 @@
 using Godot;
 using System;
 
-public partial class MovementController
+public partial class MovementController : Node
 {
-    private float _gravity = -9.81f;
-    private float _jumpForce = 5.0f;
-
-    private Vector3 _velocity = Vector3.Zero;
+    /* Nodes */
+    private PlayerController _player;
+    private Node3D _meshRoot;
+    private Node3D _cameraRoot;
     
+    /* Movement variables */
+    private Vector3 _velocity = Vector3.Zero;
+    private Vector3 _direction = Vector3.Zero;
+    
+    private float _playerInitRotation;
 
 
-    private PlayerController _playerController;
-    private Camera3D _camera;
-
-    public MovementController(PlayerController playerController, Camera3D camera)
+    /* Movement configuration */
+    public MovementController(PlayerController playerController, Node3D meshRoot, Node3D cameraRoot)
     {
-        this._playerController = playerController;
-        _camera = camera;
+        this._player = playerController;
+        this._meshRoot = meshRoot;
+        this._cameraRoot = cameraRoot;
 
-        _playerController.Connect(nameof(PlayerController.SetMovementStateEventHandler), this, nameof(OnMovementStateChange));
+        _playerInitRotation = playerController.Rotation.Y;
+
+        Connect(nameof(PlayerController.PlayerInputChangedEventHandler), new Callable(this, nameof(OnInputChanged)));
     }
 
-    public void Handle(double delta, Vector3 direction)
-    {
-        // camera
-        AlignPlayerToCamera();
+    public void Handle(double delta)
+    {   
+        // Apply the player's movement and player's rotation
+        HandleMovement(delta);
 
-
-        // movement
-        _playerController.Velocity = _velocity;
-        _playerController.MoveAndSlide();
+        // Move the player
+        _player.Velocity = _velocity;
+        _player.MoveAndSlide();
     }
 
-
-
-
-    /* Movement */
-    public void OnInputChanged(Vector3 direction)
+    private void HandleMovement(double delta)
     {
-        Vector3 possibleDirections = _playerController.movementState.PossibleDirections;
-        Vector3 currentVelocity = _velocity;
+        Vector3 possibleDirections = _player.movementState.PossibleDirections;
 
-        GD.Print("Direction: " + direction);
-        GD.Print("Possible Directions: " + possibleDirections);
-        
-        if (direction == Vector3.Zero || possibleDirections == Vector3.Zero)
+        // If the player is not moving or the player can't move in the direction stop the player movement in the inversed possible directions
+        if (_direction == Vector3.Zero || possibleDirections == Vector3.Zero)
         {
-            var inverse = new Vector3(1 - possibleDirections.X, 1 - possibleDirections.Y, 1 - possibleDirections.Z);
-            _velocity *= inverse;
+            // TODO : Change the logique to add a momentum to the player
+            var inversePossibleDirections = new Vector3(1 - possibleDirections.X, 1 - possibleDirections.Y, 1 - possibleDirections.Z);
+            _velocity *= inversePossibleDirections;
             return;
         }
 
-        Basis cameraBasis = _camera.GlobalTransform.Basis;
+        // Align the movement with the camera
+        Basis cameraBasis = _cameraRoot.GlobalTransform.Basis;
         Vector3 forward = cameraBasis.Z.Normalized();
         Vector3 right = cameraBasis.X.Normalized();
         Vector3 up = cameraBasis.Y.Normalized();
 
-        Vector3 movement = (right * direction.X + up * direction.Y + forward * direction.Z).Normalized();
+        Vector3 movement = (right * _direction.X + up * _direction.Y + forward * _direction.Z).Normalized();
         movement *= possibleDirections;
 
-        // Appliquer la vitesse
-        if (possibleDirections.X == 1) _velocity.X = movement.X * _playerController.movementState.MovementSpeed;
-        if (possibleDirections.Y == 1) _velocity.Y = movement.Y * _playerController.movementState.MovementSpeed;
-        if (possibleDirections.Z == 1) _velocity.Z = movement.Z * _playerController.movementState.MovementSpeed;
+        // Apply the movement
+        if (possibleDirections.X == 1) _velocity.X = movement.X * _player.movementState.MovementSpeed;
+        if (possibleDirections.Y == 1) _velocity.Y = movement.Y * _player.movementState.MovementSpeed;
+        if (possibleDirections.Z == 1) _velocity.Z = movement.Z * _player.movementState.MovementSpeed;
+
+        // Smoothly interpolate the current mesh rotation towards the target rotation
+        float targetRotation = Mathf.Atan2(movement.X, movement.Z) - _playerInitRotation;
+        float currentRotation = _meshRoot.Rotation.Y;
+        _meshRoot.Rotation = new Vector3(
+            _meshRoot.Rotation.X,
+            Mathf.LerpAngle(currentRotation, targetRotation, (float)delta * _player.rotationSpeed),
+            _meshRoot.Rotation.Z
+        );
+    }
+
+
+
+    /* Signals */
+    public void OnInputChanged(Vector3 direction)
+    {
+        _direction = direction;
     }
 
     public void OnJump()
     {
-        if (_playerController.IsOnFloor())
+        if (_player.IsOnFloor())
         {
-            _velocity.Y += _jumpForce;
+            _velocity.Y += _player.jumpForce;
         }
     }
 
     public void OnFall(double delta)
-{
-    if (_playerController.IsOnFloor())
     {
-        _velocity.Y = 0;
-    }
-    else
-    {
-        _velocity.Y += _gravity * (float)delta;
-    }
-}
-
-
-
-
-
-    /* Camera */
-    public void AlignPlayerToCamera()
-    {
-        Vector3 directionToCamera = _camera.GlobalPosition - _playerController.GlobalTransform.Origin;
-        directionToCamera.Y = 0;
-        directionToCamera = directionToCamera.Normalized();
-        _playerController.LookAt(_playerController.GlobalTransform.Origin - directionToCamera, Vector3.Up);
+        if (_player.IsOnFloor())
+        {
+            _velocity.Y = 0;
+        }
+        else
+        {
+            _velocity.Y += _player.gravity * (float)delta;
+        }
     }
 }

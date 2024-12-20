@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Godot;
 
-public abstract class MovementState
+
+public abstract partial class MovementState : Resource
 {
     public int Id { get; private set; }
     public float MovementSpeed { get; protected set; }

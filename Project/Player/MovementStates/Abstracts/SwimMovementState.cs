@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 
-public abstract class SwimMovementState : MovementState
+public abstract partial class SwimMovementState : MovementState
 {
     public SwimMovementState() {
         InputActions = new List<(string, Vector3)>

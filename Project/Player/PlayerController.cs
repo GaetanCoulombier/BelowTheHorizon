@@ -11,19 +11,29 @@ public partial class PlayerController : CharacterBody3D
     private MovementController _movementController; // Handling movement and physics
 
     /* Movement configuration */
-    public MovementState movementState { get; private set; } = MovementState.WALK;
-    public MovementType movementType { get; private set; } = MovementType.GROUND;
+    [Export] public float gravity = -9.81f;
+    [Export] public float jumpForce = 5.0f;
+    [Export] public float rotationSpeed = 8.0f;
+    public MovementState movementState = MovementState.WALK;
+    public MovementType movementType = MovementType.GROUND;
+
+    /* Inputs */
+    private Vector3 _inputDirection = Vector3.Zero;
 
     /* Signals */
-    [Signal] public delegate void SetMovementStateEventHandler();
-    [Signal] public delegate void SetMovementTypeEventHandler();
-
+    [Signal]
+    public delegate void PlayerInputChangedEventHandler(Vector3 direction);
+    [Signal]
+    public delegate void PlayerInputChangedEventHandler(Vector3 direction);
 
     public override void _Ready()
     {
         _camera = GetNode<Camera3D>("CamRoot/SpringArm3D/Camera3D");
-
-        _movementController = new MovementController(this, _camera);
+        
+        /* -- Initialize the controllers -- */
+        var _cameraRoot = GetNode<Node3D>("CamRoot");
+        var _meshRoot = GetNode<Node3D>("MeshRoot");
+        _movementController = new MovementController(this, _meshRoot, _camera);
         _detectionController = new DetectionController(this);
     }
 
@@ -47,7 +57,6 @@ public partial class PlayerController : CharacterBody3D
 
             // Movements
             if (Input.IsActionJustPressed("jump")) _movementController.OnJump();
-            _movementController.OnInputChanged(CalculateMoveDirectionFromInputs());
         }
         else if (movementType == MovementType.CLIMBING)
         {
@@ -61,39 +70,29 @@ public partial class PlayerController : CharacterBody3D
 
 
         /* -- Apply movement -- */
-        _movementController.OnInputChanged(CalculateMoveDirectionFromInputs());
-        _movementController.Handle(delta, CalculateMoveDirectionFromInputs());
+        _movementController.OnInputChanged(_inputDirection, delta);
+        _movementController.Handle(delta);
     }
 
-    /*
-     * Calculate the movement direction based on the inputs and the camera orientation
-     * 
-     * TODO : Add an _Input() method to handle the inputs for better performances
-     */
-    public virtual Vector3 CalculateMoveDirectionFromInputs()
-    {
-        Vector3 movement = Vector3.Zero;
 
-        foreach (var (action, axis) in movementState.GetInputActions())
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventKey eventKey && eventKey.Pressed)
         {
-            if (Input.IsActionPressed(action))
+            // Réinitialiser la direction
+            _inputDirection = Vector3.Zero;
+
+            // Parcourir les actions configurées
+            foreach (var (action, axis) in movementState.GetInputActions())
             {
-                movement += axis;
+                if (Input.IsActionPressed(action))
+                {
+                    _inputDirection += axis;
+                }
             }
+
+            // Normaliser pour éviter des mouvements plus rapides en diagonale
+            _inputDirection = _inputDirection.Normalized();
         }
-
-        return movement.Normalized();
-    }
-
-    public void SetMovementType(MovementType type)
-    {
-        movementType = type;
-        EmitSignal(nameof(SetMovementTypeHandler));
-    }
-
-    public void SetMovementState(MovementState state)
-    {
-        movementState = state;
-        EmitSignal(nameof(SetMovementStateEventHandler));
     }
 }

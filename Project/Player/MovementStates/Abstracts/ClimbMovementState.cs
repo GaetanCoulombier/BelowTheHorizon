@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Godot;
 
-public abstract class ClimbMovementState : MovementState
+public abstract partial class ClimbMovementState : MovementState
 {
     public ClimbMovementState() {
         InputActions = new List<(string, Vector3)>

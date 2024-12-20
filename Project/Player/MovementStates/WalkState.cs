@@ -1,5 +1,5 @@
 
-public class WalkState : GroundMovementState
+public partial class WalkState : GroundMovementState
 {
     public WalkState() {
         MovementSpeed = 6.0f;
