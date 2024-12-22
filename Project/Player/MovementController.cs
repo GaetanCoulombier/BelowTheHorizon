@@ -1,6 +1,5 @@
-using Godot;
 using System;
-using System.Collections.Generic;
+using Godot;
 
 public partial class MovementController : Node
 {
@@ -8,12 +7,20 @@ public partial class MovementController : Node
     [Export] private PlayerController _player;
     [Export] private Node3D _meshRoot;
     [Export] private CameraController _camera;
+    [Export] private Node3D _stickPointHolder;
+    [Export] private Node3D _stickPoint;
+    [Export] private RayCast3D _facingWallCheck;
+
+
+    private RayCast3D _leftWallCheck;
+    private RayCast3D _rightWallCheck;
+    private RayCast3D _topWallCheck;
+
     
     /* Movement variables */
-    private Vector3 _possibleDirections = Vector3.Zero;
+    private MovementType _movementType;
     private Vector3 _velocity = Vector3.Zero;
-    private Vector3 _rawDirection = Vector3.Zero;
-    private Vector3 _rotatedDirection = Vector3.Zero;
+    private Vector3 _direction = Vector3.Zero;
     private float _playerInitRotation;
     private float _cameraRotation;
 
@@ -30,14 +37,23 @@ public partial class MovementController : Node
     /* Godot methods */
     public override void _Ready()
     {
+        // Get the nodes
         _player = GetParent<PlayerController>();
         _meshRoot = _player.GetNode<Node3D>("MeshRoot");
-        _camera = _player.GetNode<CameraController>("CamRoot");
+        _camera = _player.GetNode<CameraController>("CameraController");
 
+        // Climbing
+        _facingWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastFacingWall");
+        _stickPointHolder = _meshRoot.GetNode<Node3D>("DetectionController/Climbing/StickPointHolder");
+        _stickPoint = _stickPointHolder.GetNode<Node3D>("StickPoint");
+
+        _leftWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftWall");
+        _rightWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightWall");
+        _topWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastTopWall");
+
+
+        // Get the initial rotation of the player
         _playerInitRotation = _player.Rotation.Y;
-
-        // TODO : Do it better
-        OnChangeMovementState(_player.movementState);
 
         // Connect the signals
         _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
@@ -49,46 +65,89 @@ public partial class MovementController : Node
 
     public override void _PhysicsProcess(double delta)
     {
-        UpdateMovement(delta);
+        // Update the movement based on the current movement type
+        switch (_player.movementType)
+        {
+            case MovementType.GROUND:
+                UpdateGroundMovement(delta);
+                break;
+            case MovementType.CLIMBING:
+                UpdateClimbMovement(delta);
+                break;
+            case MovementType.SWIMMING:
+                UpdateSwimMovement(delta);
+                break;
+            default:
+                GD.PrintErr("Movement state not implemented");
+                break;
+        }
 
         // Apply the velocity to the player
         _player.SetVelocity(_velocity);
         _player.MoveAndSlide();
     }
-    
+
 
 
     /* Custom methods */
-    private void UpdateMovement(double delta)
+    private void UpdateGroundMovement(double delta)
     {
-        // Momentum if the player is in the air and not touching ground
-        if (_rotatedDirection == Vector3.Zero && !_player.IsOnFloor()) {
-            if (_possibleDirections.X == 1) _velocity.X *= _possibleDirections.X * _momentum;
-            if (_possibleDirections.Y == 1) _velocity.Y *= _possibleDirections.Y * _momentum;
-            if (_possibleDirections.Z == 1) _velocity.Z *= _possibleDirections.Z * _momentum;
-            return;
-        }
+        var rotatedDirection = _direction.Rotated(Vector3.Up, _cameraRotation);
 
-        // If the player is not moving or the player can't move in the direction stop the player movement in the inversed possible directions
-        if (_rotatedDirection == Vector3.Zero || _possibleDirections == Vector3.Zero) {
-            var inversePossibleDirections = Vector3.One - _possibleDirections;
-            _velocity *= inversePossibleDirections;
+        // Momentum if the player is in the air and not touching ground
+        if (rotatedDirection == Vector3.Zero && !_player.IsOnFloor()) {
+            _velocity.X *= _momentum;
+            _velocity.Z *= _momentum;
             return;
         }
 
         // Apply the movement
-        if (_possibleDirections.X == 1) _velocity.X = _rotatedDirection.X * _speed;
-        if (_possibleDirections.Y == 1) _velocity.Y = _rotatedDirection.Y * _speed;
-        if (_possibleDirections.Z == 1) _velocity.Z = _rotatedDirection.Z * _speed;
+        _velocity.X = rotatedDirection.X * _speed;
+        _velocity.Z = rotatedDirection.Z * _speed;
 
         // Smoothly interpolate the current mesh rotation towards the target rotation
-        float targetRotation = Mathf.Atan2(_rotatedDirection.X, _rotatedDirection.Z) - _playerInitRotation;
-        float currentRotation = _meshRoot.Rotation.Y;
-        _meshRoot.Rotation = new Vector3(
-            _meshRoot.Rotation.X,
-            Mathf.LerpAngle(currentRotation, targetRotation, (float) delta * _rotationSpeed),
-            _meshRoot.Rotation.Z
-        );
+        if (rotatedDirection != Vector3.Zero)
+        {
+            float targetRotation = Mathf.Atan2(rotatedDirection.X, rotatedDirection.Z) - _playerInitRotation;
+            float currentRotation = _meshRoot.Rotation.Y;
+            _meshRoot.Rotation = new Vector3(
+                _meshRoot.Rotation.X,
+                Mathf.LerpAngle(currentRotation, targetRotation, (float) delta * _rotationSpeed),
+                _meshRoot.Rotation.Z
+            );
+        }
+    }
+
+    private void UpdateClimbMovement(double delta)
+    {
+        var surfaceNormal = _facingWallCheck.GetCollisionNormal();
+        var tangent = surfaceNormal.Cross(Vector3.Up).Normalized();
+        if (tangent == Vector3.Zero) tangent = Vector3.Right;
+
+        var localDirection = (_direction * new Basis(tangent, surfaceNormal.Cross(tangent).Normalized(), surfaceNormal)).Normalized();
+        if (localDirection == Vector3.Zero)
+        {
+            _velocity = _direction = Vector3.Zero;
+            return;
+        }
+
+        _velocity = localDirection * _speed;
+
+        // Positionnement et ajustement du joueur à la surface
+        var collisionPoint = _facingWallCheck.GetCollisionPoint();
+        _stickPointHolder.GlobalTransform = new Transform3D(_stickPointHolder.GlobalTransform.Basis, collisionPoint);
+        _player.GlobalTransform = new Transform3D(_player.GlobalTransform.Basis, 
+            new Vector3(_stickPoint.GlobalTransform.Origin.X, _player.GlobalTransform.Origin.Y, _stickPoint.GlobalTransform.Origin.Z));
+
+        // Orientation du joueur
+        _meshRoot.LookAt(_meshRoot.GlobalTransform.Origin + surfaceNormal, Vector3.Up);
+    }
+
+
+
+    private void UpdateSwimMovement(double delta)
+    {
+        throw new NotImplementedException();
     }
 
 
@@ -98,13 +157,16 @@ public partial class MovementController : Node
     {
         _speed = state.MovementSpeed;
         _acceleration = state.Acceleration;
-        _possibleDirections = state.PossibleDirections;
+    }
+    
+    public void OnChangeMovementType(MovementType type)
+    {
+        _movementType = type;
     }
 
     public void OnChangeInput(Vector3 direction)
     {
-        _rawDirection = direction;
-        _rotatedDirection = direction.Rotated(Vector3.Up, _cameraRotation);
+        _direction = direction;
     }
 
     public void OnJump()
@@ -120,6 +182,5 @@ public partial class MovementController : Node
     public void OnCameraUpdate(float cameraRotation)
     {
         _cameraRotation = cameraRotation;
-        OnChangeInput(_rawDirection);
     }
 }

@@ -1,17 +1,31 @@
+using Godot;
 
-public class DetectionController
+public partial class DetectionController : Node3D
 {
-
+    /* Componants */
     private PlayerController _playerController;
+    private RayCast3D _rayCastFacingWall;
+    private RayCast3D _rayCastClimbUp;
 
-    public DetectionController(PlayerController playerController)
+    public override void _Ready()
     {
-        _playerController = playerController;
+        _playerController = GetParent<Node3D>().GetParent<PlayerController>();
+        _rayCastFacingWall = GetNode<RayCast3D>("Climbing/RayCastFacingWall");
+        _rayCastClimbUp = GetNode<RayCast3D>("Climbing/RayCastClimbUp");
+
     }
 
-    // For now, we only handle the ground detection
-    public void Handle(double delta)
+    public override void _PhysicsProcess(double delta)
     {
-        _playerController.SetMovementType(MovementType.GROUND);
+        if (_rayCastFacingWall.IsColliding()){
+            if (_rayCastClimbUp.IsColliding() && !_playerController.IsOnFloor()){
+                _playerController.SetMovementType(MovementType.CLIMBING);
+            } else {
+                _playerController.SetMovementType(MovementType.GROUND);
+            }
+        }
+        else {
+            _playerController.SetMovementType(MovementType.GROUND);
+        }
     }
 }

@@ -1,7 +1,7 @@
 
-public partial class SwimState : MovementState
+public partial class ClimbState : MovementState
 {
-    public SwimState() {
+    public ClimbState() {
         MovementSpeed = 4.0f;
         Acceleration = 10.0f;
         CameraFov = 60.0f;

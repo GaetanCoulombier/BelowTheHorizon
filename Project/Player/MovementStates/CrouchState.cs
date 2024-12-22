@@ -1,5 +1,5 @@
 
-public partial class CrouchState : GroundMovementState
+public partial class CrouchState : MovementState
 {
     public CrouchState() {
         MovementSpeed = 4.0f;

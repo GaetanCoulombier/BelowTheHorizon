@@ -2,10 +2,21 @@ using Godot;
 using System;
 
 // This script is used to manage the game, such as the player, enemies, and other game objects.
-public partial class GameManager : Node
+public partial class GameController : Node
 {
+    /* Componants */
     private Control _inputSettingsMenu;
+    
+    /* Variables */
+    private bool _isPaused = false;
 
+    /* Signals */
+    [Signal]
+    public delegate void TriggerPauseEventHandler(bool isPaused);
+
+
+
+    /* Godot methods */
     public override void _Ready()
     {
         _inputSettingsMenu = GetNode<Control>("/root/GameRoot/GUI/InputSettings");
@@ -15,7 +26,6 @@ public partial class GameManager : Node
         _inputSettingsMenu.Visible = false;
     }
 
-    // GUI input handling
     public override void _Input(InputEvent @event)
     {
         if(@event.IsActionPressed("pause_menu"))
@@ -24,21 +34,17 @@ public partial class GameManager : Node
         }// ...
     }
 
+
+
+    /* Toggle menus */
     private void TogglePauseMenu()
     {
-        if (GlobalState.IsPaused)
-        {
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            _inputSettingsMenu.Visible = false;
-            Engine.TimeScale = 1;
-        }
-        else
-        {
-            Input.MouseMode = Input.MouseModeEnum.Visible;
-            _inputSettingsMenu.Visible = true;
-            Engine.TimeScale = 0;
-        }
+        _isPaused = !_isPaused;
 
-        GlobalState.IsPaused = !GlobalState.IsPaused;
+        Input.SetMouseMode(_isPaused ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured);
+        _inputSettingsMenu.Visible = _isPaused;
+        Engine.TimeScale = _isPaused ? 0 : 1;
+
+        EmitSignal(nameof(TriggerPause), _isPaused);
     }
 }

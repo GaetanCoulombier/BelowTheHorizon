@@ -10,6 +10,7 @@ public partial class CameraController : Node3D
 	[Export] private Node3D _pitchNode;
 
 	/* Variables */
+	private bool _isPaused = false;
 	private Tween tween;
 	private float yaw = 0;
 	private float pitch = 0;
@@ -22,6 +23,9 @@ public partial class CameraController : Node3D
 	[Signal]
 	public delegate void ChangeCameraRotationEventHandler(float cameraRotation);
 
+
+
+	/* Godot methods */
 	public override void _Ready()
 	{
 		_yawNode = GetNode<Node3D>("Yaw");
@@ -34,10 +38,13 @@ public partial class CameraController : Node3D
 
 		// Signal
         _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
+		GetNode<GameController>("/root/GameRoot/GameController").Connect(nameof(GameController.TriggerPause), new Callable(this, nameof(OnTriggerPause)));
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_isPaused) return;
+
 		pitch = Mathf.Clamp(pitch, -_maxVerticalAngle, _maxVerticalAngle);
 
 		_yawNode.RotationDegrees = new Vector3(0, yaw, 0);
@@ -46,12 +53,17 @@ public partial class CameraController : Node3D
 		EmitSignal(nameof(ChangeCameraRotation), _yawNode.Rotation.Y);
 	}
 
-	public override void _Input(InputEvent @event) {
+	public override void _Input(InputEvent @event)
+	{
+		if (_isPaused) return;
+		
 		if (@event is InputEventMouseMotion mouseEvent) {
 			yaw -= mouseEvent.Relative.X * _sensitivity;
 			pitch -= mouseEvent.Relative.Y * _sensitivity;
 		}
 	}
+
+
 
 	/* Signals */
 	private void OnChangeMovementState(MovementState state)
@@ -60,5 +72,11 @@ public partial class CameraController : Node3D
 
 		tween = CreateTween();
 		tween.TweenProperty(_camera, "fov", state.CameraFov, 0.3f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
+	}
+
+	private void OnTriggerPause(bool isPaused)
+	{
+		Input.SetMouseMode(isPaused ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured);
+		_isPaused = isPaused;
 	}
 }

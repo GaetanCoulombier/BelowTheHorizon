@@ -1,13 +1,11 @@
 using Godot;
+using Godot.Collections;
 using System;
 
 public partial class PlayerController : CharacterBody3D
 {
-    /* Controllers */
-    private DetectionController _detectionController; // Using raycasts to detect ground, walls, etc.
-
     /* Movement configuration */
-    public MovementState movementState { get; private set; } = MovementState.WALK;
+    public MovementState movementState { get; private set; }
     public MovementType movementType { get; private set; } = MovementType.GROUND;
     private Vector3 _lastInputDirection = Vector3.Zero;
 
@@ -24,10 +22,10 @@ public partial class PlayerController : CharacterBody3D
     public delegate void ChangeMovementTypeEventHandler(MovementType type);
 
 
+
+    /* Godot methods */
     public override void _Ready()
-    {        
-        /* -- Initialize the controllers -- */
-        _detectionController = new DetectionController(this);
+    {
     }
 
     public override void _Process(double delta)
@@ -36,73 +34,98 @@ public partial class PlayerController : CharacterBody3D
         UpdatePhysics();
     }
 
+
+
+    /* Custom methods */
     private void UpdatePhysics()
     {
-        // TODO : Godot process
-        //_detectionController.Handle(delta);
-
-        /* -- Handle the player input for all possible movement types -- */
-        if (movementType == MovementType.GROUND){
-            // Walk
-            SetMovementState(MovementState.WALK);
-
-            // Crouch
-            if (Input.IsActionJustPressed("crouch")) SetMovementState(MovementState.CROUCH);
-            if (Input.IsActionJustReleased("crouch")) SetMovementState(MovementState.WALK);
-
-            // Sprint
-            if (Input.IsActionPressed("sprint")) SetMovementState(MovementState.RUN);
-            if (Input.IsActionJustReleased("sprint")) SetMovementState(MovementState.WALK);
-
-            // Jump and fall
-            if (!IsOnFloor()) EmitSignal(nameof(Fall));
-            if (Input.IsActionJustPressed("jump") && IsOnFloor()) EmitSignal(nameof(Jump));
-        }
-        else if (movementType == MovementType.CLIMBING)
+        switch (movementType)
         {
-            // Handle climbing input
-        }
-        else if (movementType == MovementType.SWIMMING)
-        {
-            SetMovementState(MovementState.SWIM);
-            // Handle swimming input
+            case MovementType.GROUND:
+                if (movementState == null) SetMovementState(MovementState.WALK); // Default state
+
+                // Crouch
+                if (Input.IsActionJustPressed("crouch")) SetMovementState(MovementState.CROUCH); // TODO : prevent from running will crouching
+                if (Input.IsActionJustReleased("crouch")) SetMovementState(MovementState.WALK);
+
+                // Sprint
+                if (Input.IsActionPressed("sprint")) SetMovementState(MovementState.RUN); // TODO : prevent from running in the air
+                if (Input.IsActionJustReleased("sprint")) SetMovementState(MovementState.WALK);
+
+                // Jump and fall
+                if (!IsOnFloor()) EmitSignal(nameof(Fall));
+                if (Input.IsActionJustPressed("jump") && IsOnFloor()) EmitSignal(nameof(Jump));
+                break;
+
+            case MovementType.CLIMBING:
+                if (movementState == null) SetMovementState(MovementState.CLIMB); // Default state
+                break;
+
+            case MovementType.SWIMMING:
+                if (movementState == null) SetMovementState(MovementState.SWIM); // Default state
+                break;
+
+            default:
+                GD.PrintErr("Movement state not implemented");
+                break;
         }
     }
 
     private void UpdateInputs()
     {
-        // Réinitialiser la direction
         var inputDirection = Vector3.Zero;
 
-        // Parcourir les actions configurées
-        foreach (var (action, axis) in movementState.GetInputActions())
+        switch (movementType)
         {
-            if (Input.IsActionPressed(action))
-            {
-                inputDirection += axis;
-            }
+            case MovementType.GROUND:
+                if (Input.IsActionPressed("move_left")) inputDirection += Vector3.Left;
+                if (Input.IsActionPressed("move_right")) inputDirection += Vector3.Right;
+                if (Input.IsActionPressed("move_forward")) inputDirection += Vector3.Forward;
+                if (Input.IsActionPressed("move_backward")) inputDirection += Vector3.Back;
+                break;
+
+            case MovementType.CLIMBING:
+                if (Input.IsActionPressed("move_left")) inputDirection += Vector3.Right;
+                if (Input.IsActionPressed("move_right")) inputDirection += Vector3.Left;
+                if (Input.IsActionPressed("move_forward")) inputDirection += Vector3.Down;
+                if (Input.IsActionPressed("move_backward")) inputDirection += Vector3.Up;
+                break;
+
+            case MovementType.SWIMMING:
+                if (Input.IsActionPressed("move_left")) inputDirection += Vector3.Left;
+                if (Input.IsActionPressed("move_right")) inputDirection += Vector3.Right;
+                if (Input.IsActionPressed("move_forward")) inputDirection += Vector3.Forward;
+                if (Input.IsActionPressed("move_backward")) inputDirection += Vector3.Back;
+                if (Input.IsActionPressed("move_up")) inputDirection += Vector3.Up;
+                if (Input.IsActionPressed("move_down")) inputDirection += Vector3.Down;
+                break;
+
+            default:
+                GD.PrintErr("Movement state not implemented");
+                break;
         }
 
-        // Normaliser pour éviter des mouvements plus rapides en diagonale
+        // Normalize to prevent diagonal movement to be faster
         inputDirection = inputDirection.Normalized();
 
-        // Si la direction a changé, émettre le signal
         if (inputDirection != _lastInputDirection)
         {
             EmitSignal(nameof(ChangeInput), inputDirection);
             _lastInputDirection = inputDirection;
-            GD.Print(inputDirection);
         }
     }
 
     public void SetMovementState(MovementState state)
     {
+        if (movementState == state) return;
         movementState = state;
         EmitSignal(nameof(ChangeMovementState), state);
     }
 
     public void SetMovementType(MovementType type)
     {
+        if (movementType == type) return;
+        movementState = null; // reset the movement state
         movementType = type;
         EmitSignal(nameof(ChangeMovementType));
     }

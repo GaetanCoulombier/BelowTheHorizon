@@ -1,11 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=9 format=3 uid="uid://bmysmn7828o6k"]
 
 [ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
+[ext_resource type="Script" path="res://Project/Player/DetectionController.cs" id="2_l2k5f"]
 [ext_resource type="Script" path="res://Project/Player/MovementController.cs" id="3_ttf83"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1pln7"]
-radius = 0.603968
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_e7o63"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7rhqp"]
 
@@ -17,22 +17,8 @@ radius = 0.07
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1_ta7j4")
 
-[node name="PlayerCollisionBox" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_1pln7")
-
-[node name="DetectionsRoot" type="Node3D" parent="."]
-
-[node name="RayCastFacingWall" type="RayCast3D" parent="DetectionsRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.347438, 0)
-target_position = Vector3(0, 0, 1)
-debug_shape_custom_color = Color(0, 1, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastClimbUp" type="RayCast3D" parent="DetectionsRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0616078, 0)
-target_position = Vector3(0, 0, 1)
-debug_shape_custom_color = Color(1, 0, 1, 1)
-debug_shape_thickness = 3
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_e7o63")
 
 [node name="MeshRoot" type="Node3D" parent="."]
 
@@ -44,19 +30,41 @@ skeleton = NodePath("")
 transform = Transform3D(0.59194, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, 0.339599)
 mesh = SubResource("BoxMesh_q0pwf")
 
-[node name="CamRoot" type="Node3D" parent="."]
+[node name="DetectionController" type="Node3D" parent="MeshRoot"]
+script = ExtResource("2_l2k5f")
+
+[node name="Climbing" type="Node3D" parent="MeshRoot/DetectionController"]
+
+[node name="RayCastFacingWall" type="RayCast3D" parent="MeshRoot/DetectionController/Climbing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+target_position = Vector3(0, 0, 1)
+debug_shape_custom_color = Color(0, 1, 0, 1)
+debug_shape_thickness = 3
+
+[node name="RayCastClimbUp" type="RayCast3D" parent="MeshRoot/DetectionController/Climbing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+target_position = Vector3(0, 0, 1)
+debug_shape_custom_color = Color(1, 0, 1, 1)
+debug_shape_thickness = 3
+
+[node name="StickPointHolder" type="Marker3D" parent="MeshRoot/DetectionController/Climbing"]
+
+[node name="StickPoint" type="Marker3D" parent="MeshRoot/DetectionController/Climbing/StickPointHolder"]
+gizmo_extents = 6.5
+
+[node name="CameraController" type="Node3D" parent="."]
 script = ExtResource("1_un8fh")
 
-[node name="Yaw" type="Node3D" parent="CamRoot"]
+[node name="Yaw" type="Node3D" parent="CameraController"]
 
-[node name="Pitch" type="Node3D" parent="CamRoot/Yaw"]
+[node name="Pitch" type="Node3D" parent="CameraController/Yaw"]
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot/Yaw/Pitch"]
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraController/Yaw/Pitch"]
 shape = SubResource("SphereShape3D_tho4a")
 spring_length = 4.0
 margin = 0.5
 
-[node name="Camera3D" type="Camera3D" parent="CamRoot/Yaw/Pitch/SpringArm3D"]
+[node name="Camera3D" type="Camera3D" parent="CameraController/Yaw/Pitch/SpringArm3D"]
 
 [node name="MovementController" type="Node" parent="."]
 script = ExtResource("3_ttf83")
