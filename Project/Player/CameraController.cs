@@ -1,11 +1,11 @@
 using Godot;
-using System;
 
 public partial class CameraController : Node3D
 {
 	/* Componants */
     private Vector2 _rotation = Vector2.Zero;
 	private Camera3D _camera;
+	private Node3D _pivot;
 	private Node3D _player;
 
 	/* Variables */
@@ -14,8 +14,15 @@ public partial class CameraController : Node3D
 
 	public override void _Ready()
 	{
-		_camera = GetNode<Camera3D>("SpringArm3D/Camera3D");
+		_camera = GetNode<Camera3D>("Pivot/SpringArm3D/Camera3D");
+		_pivot = GetNode<Node3D>("Pivot");
 		_player = GetParent<Node3D>();
+
+		// Hide the mouse cursor
+		Input.SetMouseMode(Input.MouseModeEnum.Captured);
+
+		// Signal
+        _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
 	}
 
 	public override void _Process(double delta)
@@ -66,4 +73,12 @@ public partial class CameraController : Node3D
             _rotation.X = Mathf.Clamp(_rotation.X, -_maxVerticalAngle, _maxVerticalAngle);
         }
     }
+
+
+	/* Signals */
+	private void OnChangeMovementState(MovementState state)
+	{
+		// Update the camera FOV
+		_camera.Fov = state.CameraFov;
+	}
 }

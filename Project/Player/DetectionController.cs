@@ -12,6 +12,6 @@ public class DetectionController
     // For now, we only handle the ground detection
     public void Handle(double delta)
     {
-        _playerController.movementType = MovementType.GROUND;
+        _playerController.SetMovementType(MovementType.GROUND);
     }
 }

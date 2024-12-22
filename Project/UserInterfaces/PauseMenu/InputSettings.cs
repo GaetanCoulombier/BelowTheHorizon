@@ -18,7 +18,11 @@ public partial class InputSettings : Control
         { "move_backward", "Move backward" },
         { "move_left", "Move left" },
         { "move_right", "Move right" },
+        { "move_up", "Move up" },
+        { "move_down", "Move down" },
         { "jump", "Jump" },
+        { "crouch", "Crouch" },
+        { "sprint", "Sprint" }
     };
 
     string GetKeyByValue(Dictionary<string, string> dictionary, string value)

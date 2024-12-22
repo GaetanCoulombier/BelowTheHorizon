@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class MovementController : Node
 {
@@ -9,43 +10,60 @@ public partial class MovementController : Node
     private Node3D _cameraRoot;
     
     /* Movement variables */
+    private Vector3 _possibleDirections = Vector3.Zero;
     private Vector3 _velocity = Vector3.Zero;
     private Vector3 _direction = Vector3.Zero;
-    
     private float _playerInitRotation;
+    [Export] private float _speed = 0.0f;
+    [Export] private float _acceleration = 0.0f;
+    [Export] private float _rotationSpeed = 8.0f;
+    [Export] private float _gravity = -9.81f;
+    [Export] private float _jumpForce = 5.0f;
+    [Export] private float _momentum = 0.98f;
 
 
-    /* Movement configuration */
-    public MovementController(PlayerController playerController, Node3D meshRoot, Node3D cameraRoot)
+
+    /* Godot methods */
+    public override void _Ready()
     {
-        this._player = playerController;
-        this._meshRoot = meshRoot;
-        this._cameraRoot = cameraRoot;
+        _player = GetParent<PlayerController>();
+        _meshRoot = _player.GetNode<Node3D>("MeshRoot");
+        _cameraRoot = _player.GetNode<Node3D>("CamRoot");
 
-        _playerInitRotation = playerController.Rotation.Y;
+        _playerInitRotation = _player.Rotation.Y;
 
-        Connect(nameof(PlayerController.PlayerInputChangedEventHandler), new Callable(this, nameof(OnInputChanged)));
+        OnChangeMovementState(_player.movementState);
+
+        // Connect the signals
+        _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
+        _player.Connect(nameof(PlayerController.ChangeInput), new Callable(this, nameof(OnChangeInput)));
+        _player.Connect(nameof(PlayerController.Jump), new Callable(this, nameof(OnJump)));
+        _player.Connect(nameof(PlayerController.Fall), new Callable(this, nameof(OnFall)));
     }
 
-    public void Handle(double delta)
-    {   
-        // Apply the player's movement and player's rotation
-        HandleMovement(delta);
+    public override void _PhysicsProcess(double delta)
+    {
+        UpdateMovement(delta);
 
-        // Move the player
-        _player.Velocity = _velocity;
+        // Apply the velocity to the player
+        _player.SetVelocity(_velocity);
         _player.MoveAndSlide();
     }
-
-    private void HandleMovement(double delta)
+    
+    /* Custom methods */
+    private void UpdateMovement(double delta)
     {
-        Vector3 possibleDirections = _player.movementState.PossibleDirections;
+        // Momentum if the player is in the air and not touching ground
+        if (_direction == Vector3.Zero && !_player.IsOnFloor()) {
+            if (_possibleDirections.X == 1) _velocity.X *= _possibleDirections.X * _momentum;
+            if (_possibleDirections.Y == 1) _velocity.Y *= _possibleDirections.Y * _momentum;
+            if (_possibleDirections.Z == 1) _velocity.Z *= _possibleDirections.Z * _momentum;
+            return;
+        }
 
         // If the player is not moving or the player can't move in the direction stop the player movement in the inversed possible directions
-        if (_direction == Vector3.Zero || possibleDirections == Vector3.Zero)
-        {
-            // TODO : Change the logique to add a momentum to the player
-            var inversePossibleDirections = new Vector3(1 - possibleDirections.X, 1 - possibleDirections.Y, 1 - possibleDirections.Z);
+        if (_direction == Vector3.Zero || _possibleDirections == Vector3.Zero) {
+            var inversePossibleDirections = Vector3.One - _possibleDirections;
             _velocity *= inversePossibleDirections;
             return;
         }
@@ -57,48 +75,46 @@ public partial class MovementController : Node
         Vector3 up = cameraBasis.Y.Normalized();
 
         Vector3 movement = (right * _direction.X + up * _direction.Y + forward * _direction.Z).Normalized();
-        movement *= possibleDirections;
+        movement *= _possibleDirections;
 
         // Apply the movement
-        if (possibleDirections.X == 1) _velocity.X = movement.X * _player.movementState.MovementSpeed;
-        if (possibleDirections.Y == 1) _velocity.Y = movement.Y * _player.movementState.MovementSpeed;
-        if (possibleDirections.Z == 1) _velocity.Z = movement.Z * _player.movementState.MovementSpeed;
+        if (_possibleDirections.X == 1) _velocity.X = movement.X * _speed;
+        if (_possibleDirections.Y == 1) _velocity.Y = movement.Y * _speed;
+        if (_possibleDirections.Z == 1) _velocity.Z = movement.Z * _speed;
 
         // Smoothly interpolate the current mesh rotation towards the target rotation
         float targetRotation = Mathf.Atan2(movement.X, movement.Z) - _playerInitRotation;
         float currentRotation = _meshRoot.Rotation.Y;
         _meshRoot.Rotation = new Vector3(
             _meshRoot.Rotation.X,
-            Mathf.LerpAngle(currentRotation, targetRotation, (float)delta * _player.rotationSpeed),
+            Mathf.LerpAngle(currentRotation, targetRotation, (float) GetProcessDeltaTime() * _rotationSpeed),
             _meshRoot.Rotation.Z
         );
+
+        _velocity.Lerp(_velocity, _acceleration * (float) delta);
     }
 
 
-
     /* Signals */
-    public void OnInputChanged(Vector3 direction)
+    public void OnChangeMovementState(MovementState state)
+    {
+        _speed = state.MovementSpeed;
+        _acceleration = state.Acceleration;
+        _possibleDirections = state.PossibleDirections;
+    }
+
+    public void OnChangeInput(Vector3 direction)
     {
         _direction = direction;
     }
 
     public void OnJump()
     {
-        if (_player.IsOnFloor())
-        {
-            _velocity.Y += _player.jumpForce;
-        }
+        _velocity.Y = _jumpForce;
     }
 
-    public void OnFall(double delta)
+    public void OnFall()
     {
-        if (_player.IsOnFloor())
-        {
-            _velocity.Y = 0;
-        }
-        else
-        {
-            _velocity.Y += _player.gravity * (float)delta;
-        }
+        _velocity.Y += _gravity * (float) GetProcessDeltaTime();
     }
 }

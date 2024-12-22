@@ -2,21 +2,20 @@
 
 [ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
+[ext_resource type="Script" path="res://Project/Player/MovementController.cs" id="3_ttf83"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0ojva"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1pln7"]
+radius = 0.603968
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7rhqp"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_q0pwf"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_skskm"]
-radius = 0.07
-
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1_ta7j4")
 
 [node name="PlayerCollisionBox" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_0ojva")
+shape = SubResource("CapsuleShape3D_1pln7")
 
 [node name="DetectionsRoot" type="Node3D" parent="."]
 
@@ -39,14 +38,19 @@ mesh = SubResource("CapsuleMesh_7rhqp")
 skeleton = NodePath("")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MeshRoot"]
-transform = Transform3D(0.672541, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, 0.456394)
+transform = Transform3D(0.59194, 0, 0, 0, 0.297029, 0, 0, 0, 0.380864, 0, 0.448093, 0.339599)
 mesh = SubResource("BoxMesh_q0pwf")
 
 [node name="CamRoot" type="Node3D" parent="."]
 script = ExtResource("1_un8fh")
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot"]
-shape = SubResource("SphereShape3D_skskm")
-spring_length = 4.0
+[node name="Pivot" type="Node3D" parent="CamRoot"]
 
-[node name="Camera3D" type="Camera3D" parent="CamRoot/SpringArm3D"]
+[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot/Pivot"]
+spring_length = 4.0
+margin = 0.5
+
+[node name="Camera3D" type="Camera3D" parent="CamRoot/Pivot/SpringArm3D"]
+
+[node name="MovementController" type="Node" parent="."]
+script = ExtResource("3_ttf83")
