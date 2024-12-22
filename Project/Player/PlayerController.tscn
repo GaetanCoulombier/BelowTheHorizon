@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=8 format=3 uid="uid://bmysmn7828o6k"]
 
 [ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
@@ -10,6 +10,9 @@ radius = 0.603968
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_7rhqp"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_q0pwf"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_tho4a"]
+radius = 0.07
 
 [node name="PlayerController" type="CharacterBody3D"]
 script = ExtResource("1_ta7j4")
@@ -44,13 +47,16 @@ mesh = SubResource("BoxMesh_q0pwf")
 [node name="CamRoot" type="Node3D" parent="."]
 script = ExtResource("1_un8fh")
 
-[node name="Pivot" type="Node3D" parent="CamRoot"]
+[node name="Yaw" type="Node3D" parent="CamRoot"]
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot/Pivot"]
+[node name="Pitch" type="Node3D" parent="CamRoot/Yaw"]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CamRoot/Yaw/Pitch"]
+shape = SubResource("SphereShape3D_tho4a")
 spring_length = 4.0
 margin = 0.5
 
-[node name="Camera3D" type="Camera3D" parent="CamRoot/Pivot/SpringArm3D"]
+[node name="Camera3D" type="Camera3D" parent="CamRoot/Yaw/Pitch/SpringArm3D"]
 
 [node name="MovementController" type="Node" parent="."]
 script = ExtResource("3_ttf83")

@@ -4,8 +4,8 @@ using Godot;
 
 public partial class InputSettings : Control
 {
-    private PackedScene _inputButtonScene;
-    private Control _actionList;
+    [Export] private PackedScene _inputButtonScene;
+    [Export] private Control _actionList;
 
     private bool _isRemapping = false;
     private InputButton _remappingButton = null;
