@@ -21,6 +21,7 @@ public partial class DetectionController : Node3D
             if (_rayCastClimbUp.IsColliding() && !_playerController.IsOnFloor()){
                 _playerController.SetMovementType(MovementType.CLIMBING);
             } else {
+                // TODO : Make the player climb up the surface
                 _playerController.SetMovementType(MovementType.GROUND);
             }
         }

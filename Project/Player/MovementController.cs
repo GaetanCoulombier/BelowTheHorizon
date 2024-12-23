@@ -114,15 +114,12 @@ public partial class MovementController : Node
     private void UpdateClimbMovement(double delta)
     {
         // TODO : Monter en haut de la surface
-        // TODO : IMplementer le hanging
+        // TODO : Implementer le hanging
         // TODO : vérifier les murs adjacents pour pouvoir tourner si il en exisent
-        // TODO : Gérer les devers en descente
+        // TODO : Régler le problème de poussé en diagonal lorsque le joueur monte ou descends une surface en dévers
 
         GD.Print("rightSurfaceCheck: " + _rightSurfaceCheck.IsColliding());
         GD.Print("leftSurfaceCheck: " + _LeftSurfaceCheck.IsColliding());
-
-        // Push the player towards the surface to avoid floating
-        
 
         // Check if the player is at the edge of the surface
         if (!_leftFacingCheck.IsColliding() && _direction.X > 0) _direction.X = 0;
@@ -144,6 +141,11 @@ public partial class MovementController : Node
         // Apply the movement
         _velocity = localDirection * _speed;
 
+        // Push the player towards the surface (to prevent detachment)
+        Vector3 pushToSurface = surfaceNormal * -2.0f;
+        _velocity += pushToSurface;
+
+        // Rotate the player towards the surface
         _meshRoot.LookAt(_meshRoot.GlobalTransform.Origin + surfaceNormal, Vector3.Up);
         _meshRoot.Rotation = new Vector3(0, _meshRoot.Rotation.Y, 0);
     }
