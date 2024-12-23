@@ -177,3 +177,13 @@ mesh = SubResource("BoxMesh_mklb8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Mur14/StaticBody3D"]
 shape = SubResource("BoxShape3D_padwm")
+
+[node name="Mur15" type="MeshInstance3D" parent="."]
+transform = Transform3D(2.07023, 0, 0, 0, 3.55421, 0, 0, 0, 2.60979, -4.04945, 1.95039, 7.54176)
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mur15"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mur15/StaticBody3D"]
+shape = SubResource("BoxShape3D_padwm")

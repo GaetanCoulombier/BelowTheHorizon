@@ -7,16 +7,12 @@ public partial class MovementController : Node
     [Export] private PlayerController _player;
     [Export] private Node3D _meshRoot;
     [Export] private CameraController _camera;
-    [Export] private Node3D _stickPointHolder;
-    [Export] private Node3D _stickPoint;
-    [Export] private RayCast3D _facingWallCheck;
+    [Export] private RayCast3D _facingCheck;
+    [Export] private RayCast3D _leftFacingCheck;
+    [Export] private RayCast3D _rightFacingCheck;
+    [Export] private RayCast3D _LeftSurfaceCheck;
+    [Export] private RayCast3D _rightSurfaceCheck;
 
-
-    private RayCast3D _leftWallCheck;
-    private RayCast3D _rightWallCheck;
-    private RayCast3D _topWallCheck;
-
-    
     /* Movement variables */
     private MovementType _movementType;
     private Vector3 _velocity = Vector3.Zero;
@@ -43,14 +39,11 @@ public partial class MovementController : Node
         _camera = _player.GetNode<CameraController>("CameraController");
 
         // Climbing
-        _facingWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastFacingWall");
-        _stickPointHolder = _meshRoot.GetNode<Node3D>("DetectionController/Climbing/StickPointHolder");
-        _stickPoint = _stickPointHolder.GetNode<Node3D>("StickPoint");
-
-        _leftWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftWall");
-        _rightWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightWall");
-        _topWallCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastTopWall");
-
+        _facingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastFacing");
+        _leftFacingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftFacing");
+        _rightFacingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightFacing");
+        _LeftSurfaceCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftSurface");
+        _rightSurfaceCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightSurface");
 
         // Get the initial rotation of the player
         _playerInitRotation = _player.Rotation.Y;
@@ -120,10 +113,26 @@ public partial class MovementController : Node
 
     private void UpdateClimbMovement(double delta)
     {
-        var surfaceNormal = _facingWallCheck.GetCollisionNormal();
+        // TODO : Monter en haut de la surface
+        // TODO : IMplementer le hanging
+        // TODO : vérifier les murs adjacents pour pouvoir tourner si il en exisent
+
+        GD.Print("rightSurfaceCheck: " + _rightSurfaceCheck.IsColliding());
+        GD.Print("leftSurfaceCheck: " + _LeftSurfaceCheck.IsColliding());
+
+        // Push the player towards the surface to avoid floating
+        _direction.Z = -0.1f;
+
+        // Check if the player is at the edge of the surface
+        if (!_leftFacingCheck.IsColliding() && _direction.X > 0) _direction.X = 0;
+        if (!_rightFacingCheck.IsColliding() && _direction.X < 0) _direction.X = 0;
+
+        // Get the tangent of the surface
+        var surfaceNormal = _facingCheck.GetCollisionNormal();
         var tangent = surfaceNormal.Cross(Vector3.Up).Normalized();
         if (tangent == Vector3.Zero) tangent = Vector3.Right;
 
+        // Get the local direction of the player based on the surface
         var localDirection = (_direction * new Basis(tangent, surfaceNormal.Cross(tangent).Normalized(), surfaceNormal)).Normalized();
         if (localDirection == Vector3.Zero)
         {
@@ -131,16 +140,11 @@ public partial class MovementController : Node
             return;
         }
 
+        // Apply the movement
         _velocity = localDirection * _speed;
 
-        // Positionnement et ajustement du joueur à la surface
-        var collisionPoint = _facingWallCheck.GetCollisionPoint();
-        _stickPointHolder.GlobalTransform = new Transform3D(_stickPointHolder.GlobalTransform.Basis, collisionPoint);
-        _player.GlobalTransform = new Transform3D(_player.GlobalTransform.Basis, 
-            new Vector3(_stickPoint.GlobalTransform.Origin.X, _player.GlobalTransform.Origin.Y, _stickPoint.GlobalTransform.Origin.Z));
-
-        // Orientation du joueur
         _meshRoot.LookAt(_meshRoot.GlobalTransform.Origin + surfaceNormal, Vector3.Up);
+        _meshRoot.Rotation = new Vector3(0, _meshRoot.Rotation.Y, 0);
     }
 
 
@@ -157,6 +161,8 @@ public partial class MovementController : Node
     {
         _speed = state.MovementSpeed;
         _acceleration = state.Acceleration;
+
+        // Reset player rotation
     }
     
     public void OnChangeMovementType(MovementType type)
