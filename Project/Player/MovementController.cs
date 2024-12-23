@@ -116,12 +116,13 @@ public partial class MovementController : Node
         // TODO : Monter en haut de la surface
         // TODO : IMplementer le hanging
         // TODO : vérifier les murs adjacents pour pouvoir tourner si il en exisent
+        // TODO : Gérer les devers en descente
 
         GD.Print("rightSurfaceCheck: " + _rightSurfaceCheck.IsColliding());
         GD.Print("leftSurfaceCheck: " + _LeftSurfaceCheck.IsColliding());
 
         // Push the player towards the surface to avoid floating
-        _direction.Z = -0.1f;
+        
 
         // Check if the player is at the edge of the surface
         if (!_leftFacingCheck.IsColliding() && _direction.X > 0) _direction.X = 0;
