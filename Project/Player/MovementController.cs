@@ -10,8 +10,10 @@ public partial class MovementController : Node
     [Export] private RayCast3D _facingCheck;
     [Export] private RayCast3D _leftFacingCheck;
     [Export] private RayCast3D _rightFacingCheck;
-    [Export] private RayCast3D _LeftSurfaceCheck;
+    [Export] private RayCast3D _leftSurfaceCheck;
     [Export] private RayCast3D _rightSurfaceCheck;
+    [Export] private RayCast3D _leftCheck;
+    [Export] private RayCast3D _rightCheck;
 
     /* Movement variables */
     private MovementType _movementType;
@@ -42,8 +44,10 @@ public partial class MovementController : Node
         _facingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastFacing");
         _leftFacingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftFacing");
         _rightFacingCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightFacing");
-        _LeftSurfaceCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftSurface");
+        _leftSurfaceCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeftSurface");
         _rightSurfaceCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRightSurface");
+        _leftCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastLeft");
+        _rightCheck = _meshRoot.GetNode<RayCast3D>("DetectionController/Climbing/RayCastRight");
 
         // Get the initial rotation of the player
         _playerInitRotation = _player.Rotation.Y;
@@ -119,14 +123,23 @@ public partial class MovementController : Node
         // TODO : Régler le problème de poussé en diagonal lorsque le joueur monte ou descends une surface en dévers
 
         GD.Print("rightSurfaceCheck: " + _rightSurfaceCheck.IsColliding());
-        GD.Print("leftSurfaceCheck: " + _LeftSurfaceCheck.IsColliding());
+        GD.Print("leftSurfaceCheck: " + _leftSurfaceCheck.IsColliding());
+        GD.Print("rightCheck: " + _rightCheck.IsColliding());
+        GD.Print("leftCheck: " + _leftCheck.IsColliding());
+
+        var surfaceNormal = _facingCheck.GetCollisionNormal();
 
         // Check if the player is at the edge of the surface
         if (!_leftFacingCheck.IsColliding() && _direction.X > 0) _direction.X = 0;
         if (!_rightFacingCheck.IsColliding() && _direction.X < 0) _direction.X = 0;
 
+        // Go around inner corners
+        if (_leftCheck.IsColliding() && _direction.X > 0) surfaceNormal = _leftCheck.GetCollisionNormal();
+        if (_rightCheck.IsColliding() && _direction.X < 0) surfaceNormal = _rightCheck.GetCollisionNormal();
+
+        GD.Print("Surface normal: " + surfaceNormal);
+
         // Get the tangent of the surface
-        var surfaceNormal = _facingCheck.GetCollisionNormal();
         var tangent = surfaceNormal.Cross(Vector3.Up).Normalized();
         if (tangent == Vector3.Zero) tangent = Vector3.Right;
 

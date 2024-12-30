@@ -2,7 +2,7 @@
 
 using Godot;
 
-public partial class AnimationController : Node3D
+public partial class AnimationController : Node
 {
     /* Componants */
     private PlayerController _playerController;

@@ -26,7 +26,7 @@ project/assembly_name="BelowTheHorizon"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Godot-Mono-CustomResourceRegistry-main/addons/MonoCustomResourceRegistry/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 
