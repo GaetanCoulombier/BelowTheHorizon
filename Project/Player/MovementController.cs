@@ -27,8 +27,11 @@ public partial class MovementController : Node
     [Export] private float _acceleration = 0.0f;
     [Export] private float _rotationSpeed = 8.0f;
     [Export] private float _gravity = -9.81f;
-    [Export] private float _jumpForce = 5.0f;
+    [Export] private float _jumpForce = 4.0f;
     [Export] private float _momentum = 0.98f;
+
+
+    private AnimationTree _animationTree;
 
 
 
@@ -55,8 +58,6 @@ public partial class MovementController : Node
         // Connect the signals
         _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
         _player.Connect(nameof(PlayerController.ChangeInput), new Callable(this, nameof(OnChangeInput)));
-        _player.Connect(nameof(PlayerController.Jump), new Callable(this, nameof(OnJump)));
-        _player.Connect(nameof(PlayerController.Fall), new Callable(this, nameof(OnFall)));
         _camera.Connect(nameof(CameraController.ChangeCameraRotation), new Callable(this, nameof(OnCameraUpdate)));
     }
 
@@ -113,6 +114,9 @@ public partial class MovementController : Node
                 _meshRoot.Rotation.Z
             );
         }
+
+        // Apply gravity
+        if (!_player.IsOnFloor()) _velocity.Y += _gravity * (float) delta;
     }
 
     private void UpdateClimbMovement(double delta)
@@ -163,12 +167,11 @@ public partial class MovementController : Node
         _meshRoot.Rotation = new Vector3(0, _meshRoot.Rotation.Y, 0);
     }
 
-
-
     private void UpdateSwimMovement(double delta)
     {
         throw new NotImplementedException();
     }
+
 
 
 
@@ -177,8 +180,6 @@ public partial class MovementController : Node
     {
         _speed = state.MovementSpeed;
         _acceleration = state.Acceleration;
-
-        // Reset player rotation
     }
     
     public void OnChangeMovementType(MovementType type)
@@ -189,16 +190,6 @@ public partial class MovementController : Node
     public void OnChangeInput(Vector3 direction)
     {
         _direction = direction;
-    }
-
-    public void OnJump()
-    {
-        _velocity.Y = _jumpForce;
-    }
-
-    public void OnFall()
-    {
-        _velocity.Y += _gravity * (float) GetProcessDeltaTime();
     }
 
     public void OnCameraUpdate(float cameraRotation)

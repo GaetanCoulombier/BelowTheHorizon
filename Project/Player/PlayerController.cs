@@ -13,10 +13,6 @@ public partial class PlayerController : CharacterBody3D
     [Signal]
     public delegate void ChangeInputEventHandler(Vector3 direction);
     [Signal]
-    public delegate void JumpEventHandler();
-    [Signal]
-    public delegate void FallEventHandler();
-    [Signal]
     public delegate void ChangeMovementStateEventHandler(MovementState state);
     [Signal]
     public delegate void ChangeMovementTypeEventHandler(MovementType type);
@@ -42,19 +38,22 @@ public partial class PlayerController : CharacterBody3D
         switch (movementType)
         {
             case MovementType.GROUND:
-                if (movementState == null) SetMovementState(MovementState.WALK); // Default state
+                // Pre-calculations for better readability
+                bool isOnFloor = IsOnFloor();
+                bool isCrouching = Input.IsActionPressed("crouch");
+                bool isSprinting = Input.IsActionPressed("sprint");
 
-                // Crouch
-                if (Input.IsActionJustPressed("crouch")) SetMovementState(MovementState.CROUCH); // TODO : prevent from running will crouching
-                if (Input.IsActionJustReleased("crouch")) SetMovementState(MovementState.WALK);
-
-                // Sprint
-                if (Input.IsActionPressed("sprint")) SetMovementState(MovementState.RUN); // TODO : prevent from running in the air
-                if (Input.IsActionJustReleased("sprint")) SetMovementState(MovementState.WALK);
-
-                // Jump and fall
-                if (!IsOnFloor()) EmitSignal(nameof(Fall));
-                if (Input.IsActionJustPressed("jump") && IsOnFloor()) EmitSignal(nameof(Jump));
+                // Default state: IDLE or WALK
+                if (Velocity == Vector3.Zero)
+                    SetMovementState(MovementState.IDLE);
+                else if (isCrouching)
+                    SetMovementState(MovementState.CROUCH);
+                else if (isSprinting && isOnFloor)
+                    SetMovementState(MovementState.RUN);
+                else if (isOnFloor)
+                    SetMovementState(MovementState.WALK);
+                else
+                    SetMovementState(MovementState.FALL);
                 break;
 
             case MovementType.CLIMBING:
@@ -108,11 +107,11 @@ public partial class PlayerController : CharacterBody3D
         // Normalize to prevent diagonal movement to be faster
         inputDirection = inputDirection.Normalized();
 
-        if (inputDirection != _lastInputDirection)
-        {
-            EmitSignal(nameof(ChangeInput), inputDirection);
-            _lastInputDirection = inputDirection;
-        }
+        // Prevent from emitting the same signal
+        if (inputDirection == _lastInputDirection) return;
+
+        EmitSignal(nameof(ChangeInput), inputDirection);
+        _lastInputDirection = inputDirection;
     }
 
     public void SetMovementState(MovementState state)

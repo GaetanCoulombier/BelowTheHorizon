@@ -2,9 +2,12 @@
 public partial class WalkState : MovementState
 {
     public WalkState() {
-        MovementSpeed = 6.0f;
+        MovementSpeed = 3.0f;
         Acceleration = 15.0f;
-        CameraFov = 75.0f;
-        AnimationSpeed = 1.0f;
+    }
+
+    public override string ToString()
+    {
+        return "Walk";
     }
 }

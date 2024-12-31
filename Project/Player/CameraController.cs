@@ -16,6 +16,7 @@ public partial class CameraController : Node3D
 	private float pitch = 0;
 
 	/* Settings */
+	private float _fov = 45;
     private float _sensitivity = 0.1f; // TODO : Add this to the settings menu
     private float _maxVerticalAngle = 90; // TODO : Add this to the settings menu
 
@@ -33,11 +34,13 @@ public partial class CameraController : Node3D
 		_camera = _pitchNode.GetNode<Camera3D>("SpringArm3D/Camera3D");
 		_player = GetParent<Node3D>();
 
+		// Set the camera settings
+		_camera.Fov = _fov;
+
 		// Hide the mouse cursor
 		Input.SetMouseMode(Input.MouseModeEnum.Captured);
 
 		// Signal
-        _player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
 		GetNode<GameController>("/root/GameRoot/GameController").Connect(nameof(GameController.TriggerPause), new Callable(this, nameof(OnTriggerPause)));
 	}
 
@@ -66,14 +69,6 @@ public partial class CameraController : Node3D
 
 
 	/* Signals */
-	private void OnChangeMovementState(MovementState state)
-	{
-		tween?.Kill();
-
-		tween = CreateTween();
-		tween.TweenProperty(_camera, "fov", state.CameraFov, 0.3f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-	}
-
 	private void OnTriggerPause(bool isPaused)
 	{
 		Input.SetMouseMode(isPaused ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured);

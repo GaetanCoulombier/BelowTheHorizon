@@ -2,9 +2,12 @@
 public partial class RunState : MovementState
 {
     public RunState() {
-        MovementSpeed = 12.0f;
+        MovementSpeed = 5.0f;
         Acceleration = 30.0f;
-        CameraFov = 90.0f;
-        AnimationSpeed = 1.5f;
+    }
+
+    public override string ToString()
+    {
+        return "Run";
     }
 }
