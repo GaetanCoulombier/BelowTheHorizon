@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://biie4iokynlrg"]
 
-[ext_resource type="Script" path="res://Project/Interact/Item/IceAxe.cs" id="1_8vn5t"]
+[ext_resource type="Script" path="res://Project/Interact/Item/ClimbingAxe/ClimbingAxe.cs" id="1_8vn5t"]
 [ext_resource type="Texture2D" uid="uid://c8bcjdxr86xj6" path="res://Project/UserInterfaces/Crosshair/crosshairTexture.png" id="2_ho3kr"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_mycu1"]
@@ -8,9 +8,8 @@ radius = 0.998497
 
 [sub_resource type="TorusMesh" id="TorusMesh_1g22i"]
 
-[node name="IceAxe" type="StaticBody3D"]
+[node name="ClimbingAxe" type="RigidBody3D"]
 collision_layer = 3
-collision_mask = 0
 script = ExtResource("1_8vn5t")
 _icon = ExtResource("2_ho3kr")
 messagePrompt = "pick up"

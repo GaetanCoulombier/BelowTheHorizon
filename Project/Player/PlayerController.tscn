@@ -31,9 +31,10 @@ skeleton = NodePath("../..")
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Head" node_paths=PackedStringArray("_player", "_head")]
+[node name="Camera3D" type="Camera3D" parent="Head" node_paths=PackedStringArray("_player", "_movementController", "_head")]
 script = ExtResource("1_un8fh")
 _player = NodePath("../..")
+_movementController = NodePath("../../MovementController")
 _head = NodePath("..")
 
 [node name="InteractionRayCast" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("_quickAccessBar", "_player", "_uiInteractPrompt")]

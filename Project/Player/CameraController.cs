@@ -5,6 +5,7 @@ public partial class CameraController : Camera3D
 {
 	/* Componants */
 	[Export] private PlayerController _player;
+	[Export] private MovementController _movementController;
 	[Export] private Node3D _head;
 	private Tween tween;
 
@@ -28,7 +29,7 @@ public partial class CameraController : Camera3D
 		Input.SetMouseMode(Input.MouseModeEnum.Captured);
 
         // Signal
-		_player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
+		_movementController.Connect(nameof(MovementController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
 	}
 
 	public override void _Process(double delta)

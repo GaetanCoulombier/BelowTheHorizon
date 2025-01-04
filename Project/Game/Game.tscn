@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Project/Game/GameState.cs" id="1_71guo"]
 [ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Player/PlayerController.tscn" id="3_2eokk"]
-[ext_resource type="PackedScene" uid="uid://biie4iokynlrg" path="res://Project/Interact/Item/IceAxe.tscn" id="6_o0bnv"]
+[ext_resource type="PackedScene" uid="uid://biie4iokynlrg" path="res://Project/Interact/Item/ClimbingAxe/ClimbingAxe.tscn" id="6_o0bnv"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ro4qu"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -40,8 +40,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2067, 0)
 
 [node name="Environment" type="Node3D" parent="."]
 
-[node name="IceAxe" parent="Environment" instance=ExtResource("6_o0bnv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.48167, 0.416348, 3.12145)
+[node name="ClimbingAxe" parent="Environment" instance=ExtResource("6_o0bnv")]
 
 [node name="Sol" type="MeshInstance3D" parent="Environment"]
 transform = Transform3D(24.697, 0, 0, 0, 0.449246, 0, 0, 0, 24.697, 0, 0, 0)
