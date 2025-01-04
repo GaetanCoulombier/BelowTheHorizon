@@ -1,77 +1,74 @@
+using System;
 using Godot;
 
-public partial class CameraController : Node3D
+public partial class CameraController : Camera3D
 {
 	/* Componants */
-	[Export] private Camera3D _camera;
-	[Export] private Node3D _pivot;
-	[Export] private Node3D _player;
-	[Export] private Node3D _yawNode;
-	[Export] private Node3D _pitchNode;
-
-	/* Variables */
-	private bool _isPaused = false;
+	[Export] private PlayerController _player;
+	[Export] private Node3D _head;
 	private Tween tween;
-	private float yaw = 0;
-	private float pitch = 0;
 
 	/* Settings */
-	private float _fov = 45;
-    private float _sensitivity = 0.1f; // TODO : Add this to the settings menu
-    private float _maxVerticalAngle = 90; // TODO : Add this to the settings menu
+    private const float SENSITIVITY = 0.1f; // TODO : Add this to the settings menu
+	private const float MAX_ANGLE = 89;
+	private float BASE_FOV = 60;
 
-	/* Signals */
-	[Signal]
-	public delegate void ChangeCameraRotationEventHandler(float cameraRotation);
-
-
+	/* Head bobbing */
+	private const float BOB_AMP = 0.1f;
+	private const float BOB_FREQ = 2.0f;
+	private float _bobTime = 0.0f;
 
 	/* Godot methods */
 	public override void _Ready()
 	{
-		_yawNode = GetNode<Node3D>("Yaw");
-		_pitchNode = _yawNode.GetNode<Node3D>("Pitch");
-		_camera = _pitchNode.GetNode<Camera3D>("SpringArm3D/Camera3D");
-		_player = GetParent<Node3D>();
-
 		// Set the camera settings
-		_camera.Fov = _fov;
+		this.Fov = BASE_FOV;
 
 		// Hide the mouse cursor
 		Input.SetMouseMode(Input.MouseModeEnum.Captured);
 
-		// Signal
-		GetNode<GameController>("/root/GameRoot/GameController").Connect(nameof(GameController.TriggerPause), new Callable(this, nameof(OnTriggerPause)));
+        // Signal
+		_player.Connect(nameof(PlayerController.ChangeMovementState), new Callable(this, nameof(OnChangeMovementState)));
 	}
 
-	public override void _PhysicsProcess(double delta)
+	public override void _Process(double delta)
 	{
-		if (_isPaused) return;
+		if (GameState.isActionsBlocked) return;
 
-		pitch = Mathf.Clamp(pitch, -_maxVerticalAngle, _maxVerticalAngle);
-
-		_yawNode.RotationDegrees = new Vector3(0, yaw, 0);
-		_pitchNode.RotationDegrees = new Vector3(pitch, 0, 0);
-
-		EmitSignal(nameof(ChangeCameraRotation), _yawNode.Rotation.Y);
+        // Bobbing effect
+		_bobTime += (float) delta * _player.Velocity.Length() * (_player.IsOnFloor() ? 1.0f : 0.0f);
+		var transform = Transform;
+		transform.Origin = HeadBobbing(_bobTime);
+		Transform = transform;
 	}
 
-	public override void _Input(InputEvent @event)
+    public override void _Input(InputEvent @event)
 	{
-		if (_isPaused) return;
-		
 		if (@event is InputEventMouseMotion mouseEvent) {
-			yaw -= mouseEvent.Relative.X * _sensitivity;
-			pitch -= mouseEvent.Relative.Y * _sensitivity;
+			if (GameState.isActionsBlocked) return;
+
+			// Rotate the player
+			_head.RotateY(Mathf.DegToRad(-mouseEvent.Relative.X * SENSITIVITY));
+			this.RotateX(Mathf.DegToRad(-mouseEvent.Relative.Y * SENSITIVITY));
+			this.Rotation = new Vector3(Mathf.Clamp(this.Rotation.X, Mathf.DegToRad(-MAX_ANGLE), Mathf.DegToRad(MAX_ANGLE)), this.Rotation.Y, this.Rotation.Z);
 		}
 	}
 
-
+    private Vector3 HeadBobbing(float time)
+    {
+		var pos = Vector3.Zero;
+		pos.Y = Mathf.Sin(time * BOB_FREQ) * BOB_AMP;
+		pos.X = MathF.Cos(time * BOB_FREQ / 2) *BOB_AMP;
+		return pos;
+    }
 
 	/* Signals */
-	private void OnTriggerPause(bool isPaused)
-	{
-		Input.SetMouseMode(isPaused ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured);
-		_isPaused = isPaused;
-	}
+	public void OnChangeMovementState(MovementState movementState)
+    {
+		tween?.Kill();
+
+		tween = CreateTween();
+		var newFov = movementState.added_fov + BASE_FOV;
+		tween.TweenProperty(this, "fov", newFov, 0.3f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
+    }
 }

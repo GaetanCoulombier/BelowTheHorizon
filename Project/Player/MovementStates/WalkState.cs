@@ -2,8 +2,8 @@
 public partial class WalkState : MovementState
 {
     public WalkState() {
-        MovementSpeed = 3.0f;
-        Acceleration = 15.0f;
+        speed = 4.0f;
+        added_fov = 0.0f;
     }
 
     public override string ToString()

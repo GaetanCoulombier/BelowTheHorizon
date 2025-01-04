@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://5wvn4mcvk72n"]
+
+[ext_resource type="Script" path="res://Project/Interact/Object/BTHButton.cs" id="1_s0x2t"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_thoy7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_o4op7"]
+
+[node name="Button" type="StaticBody3D"]
+collision_layer = 3
+collision_mask = 0
+script = ExtResource("1_s0x2t")
+messagePrompt = "Button"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_thoy7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_o4op7")

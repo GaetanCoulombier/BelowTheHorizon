@@ -1,9 +1,10 @@
 using Godot;
-using Godot.Collections;
-using System;
 
 public partial class PlayerController : CharacterBody3D
 {
+    /* Inventory */
+    [Export] public Inventory inventory;
+
     /* Movement configuration */
     public MovementState movementState { get; private set; }
     public MovementType movementType { get; private set; } = MovementType.GROUND;
@@ -14,6 +15,10 @@ public partial class PlayerController : CharacterBody3D
     public delegate void ChangeInputEventHandler(Vector3 direction);
     [Signal]
     public delegate void ChangeMovementStateEventHandler(MovementState state);
+    [Signal]
+    public delegate void JumpEventHandler();
+    [Signal]
+    public delegate void FallEventHandler();
     [Signal]
     public delegate void ChangeMovementTypeEventHandler(MovementType type);
 
@@ -42,18 +47,22 @@ public partial class PlayerController : CharacterBody3D
                 bool isOnFloor = IsOnFloor();
                 bool isCrouching = Input.IsActionPressed("crouch");
                 bool isSprinting = Input.IsActionPressed("sprint");
+                bool isJumping = Input.IsActionJustPressed("jump");
 
                 // Default state: IDLE or WALK
-                if (Velocity == Vector3.Zero)
+                if (_lastInputDirection == Vector3.Zero) // TODO verify with a raycast if the player is in front of a wall to set the state to IDLE
                     SetMovementState(MovementState.IDLE);
                 else if (isCrouching)
                     SetMovementState(MovementState.CROUCH);
-                else if (isSprinting && isOnFloor)
+                else if (isSprinting)
                     SetMovementState(MovementState.RUN);
-                else if (isOnFloor)
-                    SetMovementState(MovementState.WALK);
                 else
-                    SetMovementState(MovementState.FALL);
+                    SetMovementState(MovementState.WALK);
+
+                if (isJumping && isOnFloor)
+                    EmitSignal(nameof(Jump));
+                else if (!isOnFloor)
+                    EmitSignal(nameof(Fall));
                 break;
 
             case MovementType.CLIMBING:
@@ -127,5 +136,10 @@ public partial class PlayerController : CharacterBody3D
         movementState = null; // reset the movement state
         movementType = type;
         EmitSignal(nameof(ChangeMovementType));
+    }
+
+    public Inventory GetInventory()
+    {
+        return inventory;
     }
 }

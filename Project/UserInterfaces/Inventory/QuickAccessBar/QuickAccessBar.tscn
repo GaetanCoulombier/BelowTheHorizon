@@ -1,0 +1,44 @@
+[gd_scene load_steps=3 format=3 uid="uid://dcu2wiwbnbwwa"]
+
+[ext_resource type="Script" path="res://Project/UserInterfaces/Inventory/QuickAccessBar/QuickAccessBar.cs" id="1_u806n"]
+[ext_resource type="PackedScene" uid="uid://bb6knpwe35xv3" path="res://Project/UserInterfaces/Inventory/InventorySlot.tscn" id="2_h8n4x"]
+
+[node name="QuickAccessBar" type="Control" node_paths=PackedStringArray("_actionBarGrid")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_u806n")
+_actionBarGrid = NodePath("MarginContainer/ActionBarGrid")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -134.0
+offset_top = -74.0
+offset_right = 134.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_bottom = 10
+
+[node name="ActionBarGrid" type="GridContainer" parent="MarginContainer"]
+layout_mode = 2
+columns = 4
+
+[node name="ActionBar1" parent="MarginContainer/ActionBarGrid" instance=ExtResource("2_h8n4x")]
+layout_mode = 2
+
+[node name="ActionBar2" parent="MarginContainer/ActionBarGrid" instance=ExtResource("2_h8n4x")]
+layout_mode = 2
+
+[node name="ActionBar3" parent="MarginContainer/ActionBarGrid" instance=ExtResource("2_h8n4x")]
+layout_mode = 2
+
+[node name="ActionBar4" parent="MarginContainer/ActionBarGrid" instance=ExtResource("2_h8n4x")]
+layout_mode = 2

@@ -2,8 +2,8 @@
 public partial class RunState : MovementState
 {
     public RunState() {
-        MovementSpeed = 5.0f;
-        Acceleration = 30.0f;
+        speed = 6.0f;
+        added_fov = 5.0f;
     }
 
     public override string ToString()

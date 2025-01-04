@@ -1,8 +1,21 @@
-[gd_scene load_steps=7 format=3 uid="uid://dgxx14e0a70y8"]
+[gd_scene load_steps=10 format=3 uid="uid://dgxx14e0a70y8"]
 
-[ext_resource type="Script" path="res://Project/Game/GameController.cs" id="1_u8xyh"]
+[ext_resource type="Script" path="res://Project/Game/GameState.cs" id="1_71guo"]
 [ext_resource type="PackedScene" uid="uid://bmysmn7828o6k" path="res://Project/Player/PlayerController.tscn" id="3_2eokk"]
-[ext_resource type="PackedScene" uid="uid://dl6irgcvodwx7" path="res://Project/UserInterfaces/PauseMenu/InputSettings.tscn" id="3_s8lgb"]
+[ext_resource type="PackedScene" uid="uid://biie4iokynlrg" path="res://Project/Interact/Item/IceAxe.tscn" id="6_o0bnv"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ro4qu"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_nv0xw"]
+sky_material = SubResource("ProceduralSkyMaterial_ro4qu")
+
+[sub_resource type="Environment" id="Environment_cma6l"]
+background_mode = 2
+sky = SubResource("Sky_nv0xw")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_mklb8"]
 
@@ -12,23 +25,23 @@
 
 [node name="GameRoot" type="Node3D"]
 
-[node name="GameController" type="Node" parent="."]
-script = ExtResource("1_u8xyh")
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_cma6l")
+
+[node name="GameState" type="Node" parent="."]
+script = ExtResource("1_71guo")
 
 [node name="PlayerController" parent="." instance=ExtResource("3_2eokk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.22462, 0)
-
-[node name="GUI" type="CanvasLayer" parent="."]
-
-[node name="InputSettings" parent="GUI" instance=ExtResource("3_s8lgb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2067, 0)
 
 [node name="Environment" type="Node3D" parent="."]
 
-[node name="Sun" type="DirectionalLight3D" parent="Environment"]
-transform = Transform3D(0.973623, -0.0532793, -0.221856, 0.228164, 0.227354, 0.946706, 0, -0.972354, 0.233513, 0, 9.28965, 0)
-light_angular_distance = 51.73
-shadow_enabled = true
-sky_mode = 1
+[node name="IceAxe" parent="Environment" instance=ExtResource("6_o0bnv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.48167, 0.416348, 3.12145)
 
 [node name="Sol" type="MeshInstance3D" parent="Environment"]
 transform = Transform3D(24.697, 0, 0, 0, 0.449246, 0, 0, 0, 24.697, 0, 0, 0)

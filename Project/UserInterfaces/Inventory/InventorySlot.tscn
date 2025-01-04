@@ -1,0 +1,80 @@
+[gd_scene load_steps=6 format=3 uid="uid://bb6knpwe35xv3"]
+
+[ext_resource type="Script" path="res://Project/UserInterfaces/Inventory/InventorySlot.cs" id="1_ssdjk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ktuny"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_soaog"]
+bg_color = Color(0.147672, 0.147672, 0.147672, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.758192, 0.758192, 0.758192, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uvhqh"]
+bg_color = Color(0.281187, 0.281187, 0.281187, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.756863, 0.756863, 0.756863, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ric3f"]
+bg_color = Color(0.147672, 0.147672, 0.147672, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.377919, 0.377919, 0.377919, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="InventorySlot" type="Button" node_paths=PackedStringArray("_icon", "_stackSizeLabel")]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ktuny")
+theme_override_styles/hover = SubResource("StyleBoxFlat_soaog")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_uvhqh")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ric3f")
+script = ExtResource("1_ssdjk")
+_icon = NodePath("ItemTexture")
+_stackSizeLabel = NodePath("MarginContainer/StackSizeLabel")
+
+[node name="ItemTexture" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="StackSizeLabel" type="Label" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 1
+horizontal_alignment = 2
+vertical_alignment = 2

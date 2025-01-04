@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cbfpfugw7xxmt" path="res://Project/UserInterfaces/PauseMenu/InputButton.tscn" id="1_07dg3"]
 [ext_resource type="FontFile" uid="uid://dva03ei3yvboa" path="res://Fonts/PixelSplitter-Bold.ttf" id="3_vjore"]
 
-[node name="InputSettings" type="Control"]
+[node name="InputSettings" type="Control" node_paths=PackedStringArray("_actionList", "_resetButton")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,6 +12,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_2cvxd")
+_inputButtonScene = ExtResource("1_07dg3")
+_actionList = NodePath("PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ActionList")
+_resetButton = NodePath("PanelContainer/MarginContainer/VBoxContainer/ResetButton")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1

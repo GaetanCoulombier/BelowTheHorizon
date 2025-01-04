@@ -1,43 +1,19 @@
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public partial class InputSettings : Control
 {
     [Export] private PackedScene _inputButtonScene;
     [Export] private Control _actionList;
+    [Export] private Button _resetButton;
 
     private bool _isRemapping = false;
     private InputButton _remappingButton = null;
     private string _remappingAction = null;
 
-    /* Remappable actions */
-    private Dictionary<string, string> _allowRemapActions = new Dictionary<string, string>
-    {
-        { "move_forward", "Move forward" },
-        { "move_backward", "Move backward" },
-        { "move_left", "Move left" },
-        { "move_right", "Move right" },
-        { "move_up", "Move up" },
-        { "move_down", "Move down" },
-        { "jump", "Jump" },
-        { "crouch", "Crouch" },
-        { "sprint", "Sprint" }
-    };
-
-    string GetKeyByValue(Dictionary<string, string> dictionary, string value)
-    {
-        return dictionary.FirstOrDefault(pair => pair.Value == value).Key;
-    }
-
     /* Remapping */
     public override void _Ready()
     {
-        _actionList = GetNode<Control>("/root/GameRoot/GUI/InputSettings/PanelContainer/MarginContainer/VBoxContainer/ScrollContainer/ActionList");
-        _inputButtonScene = ResourceLoader.Load<PackedScene>("res://Project/UserInterfaces/PauseMenu/InputButton.tscn");
-        var _restButton = GetNode<Button>("/root/GameRoot/GUI/InputSettings/PanelContainer/MarginContainer/VBoxContainer/ResetButton");
-
-        _restButton.Connect("pressed", new Callable(this, nameof(OnResetButtonPressed)));
+        _resetButton.Connect("pressed", new Callable(this, nameof(OnResetButtonPressed)));
 
         CreateActionList();
     }
@@ -52,14 +28,10 @@ public partial class InputSettings : Control
             item.QueueFree();
 
         // Ajouter les actions remappables
-        foreach (var action in _allowRemapActions.Keys)
+        foreach (var action in Utils._actions.Keys)
         {
-            string actionLabel = _allowRemapActions[action];
-            string inputLabel = "";
-
-            var events = InputMap.ActionGetEvents(action);
-            if (events.Count > 0)
-                inputLabel = events[0].AsText();
+            string actionLabel = Utils._actions[action];
+            string inputLabel = Utils.GetKeyByAction(action);
 
             // Instancier et configurer le bouton
             var button = _inputButtonScene.Instantiate<InputButton>();
@@ -81,7 +53,7 @@ public partial class InputSettings : Control
         // Début du remapping
         _isRemapping = true;
         _remappingButton = button;
-        _remappingAction = GetKeyByValue(_allowRemapActions, button.GetActionLabel()); // We need to get the same name than the godot InputMap action
+        _remappingAction = Utils.GetActionKeyByValue(button.GetActionLabel()); // We need to get the same name than the godot InputMap action
 
         // Indiquer visuellement que l'utilisateur doit appuyer sur une touche
         _remappingButton.UpdateInputLabel("Press key to bind");

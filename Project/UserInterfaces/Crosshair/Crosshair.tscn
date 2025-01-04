@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://dst7bfpcjyymr"]
+
+[ext_resource type="Texture2D" uid="uid://c8bcjdxr86xj6" path="res://Project/UserInterfaces/Crosshair/crosshairTexture.png" id="1_ujlwx"]
+
+[node name="Crosshair" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_ujlwx")

@@ -2,8 +2,8 @@
 public partial class CrouchState : MovementState
 {
     public CrouchState() {
-        MovementSpeed = 2.0f;
-        Acceleration = 10.0f;
+        speed = 3.0f;
+        added_fov = 0.0f;
     }
 
     public override string ToString()
