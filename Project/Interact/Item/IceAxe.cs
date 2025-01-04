@@ -2,9 +2,13 @@ using Godot;
 
 public partial class IceAxe : BTHItem
 {
-    public override void Interact(PlayerController player)
+    public override void UsePrimary(PlayerController player)
     {
-        base.Interact(player);
-        GD.Print("Picking up Ice Axe");
+        GD.Print("Using Ice Axe primary");
+    }
+
+    public override void UseSecondary(PlayerController player)
+    {
+        GD.Print("Using Ice Axe secondary");
     }
 }

@@ -1,14 +1,13 @@
-[gd_scene load_steps=14 format=3 uid="uid://bmysmn7828o6k"]
+[gd_scene load_steps=13 format=3 uid="uid://bmysmn7828o6k"]
 
 [ext_resource type="Script" path="res://Project/Player/PlayerController.cs" id="1_ta7j4"]
 [ext_resource type="Script" path="res://Project/Player/CameraController.cs" id="1_un8fh"]
-[ext_resource type="Script" path="res://Project/Player/DetectionController.cs" id="2_l2k5f"]
 [ext_resource type="Script" path="res://Project/Player/MovementController.cs" id="3_ttf83"]
 [ext_resource type="PackedScene" uid="uid://b6bocfw6teube" path="res://Project/UserInterfaces/Interaction/InteractionPrompt.tscn" id="4_u20te"]
 [ext_resource type="Script" path="res://Project/Player/UserInterfaceController.cs" id="6_kc6md"]
 [ext_resource type="PackedScene" uid="uid://dst7bfpcjyymr" path="res://Project/UserInterfaces/Crosshair/Crosshair.tscn" id="6_wywvs"]
-[ext_resource type="PackedScene" uid="uid://btqa5jckcn3pl" path="res://Project/UserInterfaces/Inventory/Inventory.tscn" id="7_mgndo"]
-[ext_resource type="PackedScene" uid="uid://dcu2wiwbnbwwa" path="res://Project/UserInterfaces/Inventory/QuickAccessBar/QuickAccessBar.tscn" id="9_aeafw"]
+[ext_resource type="PackedScene" uid="uid://btqa5jckcn3pl" path="res://Project/UserInterfaces/SlotContainer/Inventory/Inventory.tscn" id="7_mgndo"]
+[ext_resource type="PackedScene" uid="uid://dcu2wiwbnbwwa" path="res://Project/UserInterfaces/SlotContainer/QuickAccessBar/QuickAccessBar.tscn" id="9_aeafw"]
 [ext_resource type="PackedScene" uid="uid://dl6irgcvodwx7" path="res://Project/UserInterfaces/PauseMenu/InputSettings.tscn" id="9_drwoq"]
 [ext_resource type="Script" path="res://Project/Player/InteractionController.cs" id="18_i4cpv"]
 
@@ -16,9 +15,9 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_nsouh"]
 
-[node name="PlayerController" type="CharacterBody3D" node_paths=PackedStringArray("inventory")]
+[node name="PlayerController" type="CharacterBody3D" node_paths=PackedStringArray("_inventory")]
 script = ExtResource("1_ta7j4")
-inventory = NodePath("GUI/Inventory")
+_inventory = NodePath("GUI/Inventory")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_4haau")
@@ -37,88 +36,27 @@ script = ExtResource("1_un8fh")
 _player = NodePath("../..")
 _head = NodePath("..")
 
-[node name="InteractionRayCast" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("_player", "_uiInteractPrompt")]
+[node name="InteractionRayCast" type="RayCast3D" parent="Head/Camera3D" node_paths=PackedStringArray("_quickAccessBar", "_player", "_uiInteractPrompt")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 target_position = Vector3(0, 0, 3)
 script = ExtResource("18_i4cpv")
+_quickAccessBar = NodePath("../../../GUI/HUD/QuickAccessBar")
 _player = NodePath("../../..")
 _uiInteractPrompt = NodePath("../../../GUI/HUD/InteractionPrompt")
 
-[node name="DetectionController" type="Node3D" parent="." node_paths=PackedStringArray("_playerController", "_rayCastFacing", "_rayCastClimbUp")]
-script = ExtResource("2_l2k5f")
-_playerController = NodePath("..")
-_rayCastFacing = NodePath("Climbing/RayCastFacing")
-_rayCastClimbUp = NodePath("Climbing/RayCastClimbUp")
-
-[node name="Climbing" type="Node3D" parent="DetectionController"]
-
-[node name="RayCastClimbUp" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-target_position = Vector3(0, 0, -1)
-debug_shape_custom_color = Color(1, 0, 1, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastFacing" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-target_position = Vector3(0, 0, -1)
-debug_shape_custom_color = Color(0, 1, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastRightFacing" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, -0.3, 0)
-target_position = Vector3(0, 0, -0.8)
-debug_shape_custom_color = Color(0, 1, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastLeftFacing" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, -0.3, 0)
-target_position = Vector3(0, 0, -0.8)
-debug_shape_custom_color = Color(0, 1, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastLeftSurface" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.6, -0.3, -1)
-target_position = Vector3(0, 0, 0.5)
-debug_shape_custom_color = Color(1, 0, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastRightSurface" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.6, -0.3, -1)
-target_position = Vector3(0, 0, 0.5)
-debug_shape_custom_color = Color(1, 0, 0, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastRight" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-target_position = Vector3(0.7, 0, 0)
-debug_shape_custom_color = Color(0, 0, 1, 1)
-debug_shape_thickness = 3
-
-[node name="RayCastLeft" type="RayCast3D" parent="DetectionController/Climbing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
-target_position = Vector3(-0.7, 0, 0)
-debug_shape_custom_color = Color(0, 0, 1, 1)
-debug_shape_thickness = 3
-
-[node name="MovementController" type="Node" parent="." node_paths=PackedStringArray("_player", "_head", "_facingCheck", "_leftFacingCheck", "_rightFacingCheck", "_leftSurfaceCheck", "_rightSurfaceCheck", "_leftCheck", "_rightCheck")]
+[node name="MovementController" type="Node" parent="." node_paths=PackedStringArray("_player", "_head")]
 script = ExtResource("3_ttf83")
 _player = NodePath("..")
 _head = NodePath("../Head")
-_facingCheck = NodePath("../DetectionController/Climbing/RayCastFacing")
-_leftFacingCheck = NodePath("../DetectionController/Climbing/RayCastLeftFacing")
-_rightFacingCheck = NodePath("../DetectionController/Climbing/RayCastRightFacing")
-_leftSurfaceCheck = NodePath("../DetectionController/Climbing/RayCastLeftSurface")
-_rightSurfaceCheck = NodePath("../DetectionController/Climbing/RayCastRightSurface")
-_leftCheck = NodePath("../DetectionController/Climbing/RayCastLeft")
-_rightCheck = NodePath("../DetectionController/Climbing/RayCastRight")
 
-[node name="UserInterfaceController" type="Node" parent="." node_paths=PackedStringArray("_player", "_uiInteractPrompt", "_uiInventory", "_uiPauseMenu", "_uiHUD")]
+[node name="UserInterfaceController" type="Node" parent="." node_paths=PackedStringArray("_uiHUD", "_crosshair", "_uiInteractPrompt", "_uiQuickAccessBar", "_uiInventory", "_uiPauseMenu")]
 script = ExtResource("6_kc6md")
-_player = NodePath("..")
+_uiHUD = NodePath("../GUI/HUD")
+_crosshair = NodePath("../GUI/HUD/Crosshair")
 _uiInteractPrompt = NodePath("../GUI/HUD/InteractionPrompt")
+_uiQuickAccessBar = NodePath("../GUI/HUD/QuickAccessBar")
 _uiInventory = NodePath("../GUI/Inventory")
 _uiPauseMenu = NodePath("../GUI/InputSettings")
-_uiHUD = NodePath("../GUI/HUD")
 
 [node name="GUI" type="CanvasLayer" parent="."]
 
@@ -136,11 +74,13 @@ layout_mode = 1
 [node name="InteractionPrompt" parent="GUI/HUD" instance=ExtResource("4_u20te")]
 layout_mode = 1
 
-[node name="QuickAccessBar" parent="GUI/HUD" instance=ExtResource("9_aeafw")]
+[node name="QuickAccessBar" parent="GUI/HUD" node_paths=PackedStringArray("_player") instance=ExtResource("9_aeafw")]
 layout_mode = 1
+_player = NodePath("../../..")
 
-[node name="Inventory" parent="GUI" instance=ExtResource("7_mgndo")]
+[node name="Inventory" parent="GUI" node_paths=PackedStringArray("_player") instance=ExtResource("7_mgndo")]
 visible = false
+_player = NodePath("../..")
 
 [node name="InputSettings" parent="GUI" instance=ExtResource("9_drwoq")]
 visible = false

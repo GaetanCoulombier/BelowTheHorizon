@@ -3,13 +3,15 @@ using Godot;
 public abstract partial class BTHItem : BTHInteractable
 {
     [Export] private Texture2D _icon;
-    private int _maxStackSize = 1;//[Export] private int _maxStackSize = 1;
     private bool _inInventory = false;
 
     public override void _Ready()
     {
         SetPromptMessage("pick up");
     }
+
+    public abstract void UsePrimary(PlayerController player);
+    public abstract void UseSecondary(PlayerController player);
 
     public override void Interact(PlayerController player)
     {
@@ -48,10 +50,5 @@ public abstract partial class BTHItem : BTHInteractable
     public Texture2D GetIcon()
     {
         return _icon;
-    }
-
-    public int GetMaxStackSize()
-    {
-        return _maxStackSize;
     }
 }

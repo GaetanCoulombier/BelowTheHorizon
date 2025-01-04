@@ -2,8 +2,8 @@ using Godot;
 
 public partial class PlayerController : CharacterBody3D
 {
-    /* Inventory */
-    [Export] public Inventory inventory;
+    /* Nodes */
+    [Export] private Inventory _inventory;
 
     /* Movement configuration */
     public MovementState movementState { get; private set; }
@@ -31,13 +31,14 @@ public partial class PlayerController : CharacterBody3D
 
     public override void _Process(double delta)
     {
+        SetMovementType(MovementType.GROUND);
         UpdateInputs();
         UpdatePhysics();
     }
 
 
 
-    /* Custom methods */
+    /* Update the movement and the current type of physics */
     private void UpdatePhysics()
     {
         switch (movementType)
@@ -79,6 +80,7 @@ public partial class PlayerController : CharacterBody3D
         }
     }
 
+    // Update the movement inputs and emit the signal
     private void UpdateInputs()
     {
         var inputDirection = Vector3.Zero;
@@ -137,9 +139,9 @@ public partial class PlayerController : CharacterBody3D
         movementType = type;
         EmitSignal(nameof(ChangeMovementType));
     }
-
+    
     public Inventory GetInventory()
     {
-        return inventory;
+        return _inventory;
     }
 }
