@@ -1,9 +1,17 @@
 using Godot;
 
-public partial class BTHButton : BTHInteractable
+namespace BelowTheHorizon
 {
-	public override void Interact(PlayerController player)
+	public partial class Button : Object
 	{
-		GD.Print($"Pressing {Name}");
+		public override void Interact(PlayerController player)
+		{
+			GD.Print($"Pressing {Name}");
+		}
+
+		public override bool CanInteract(PlayerController player)
+		{
+			return true;
+		}
 	}
 }

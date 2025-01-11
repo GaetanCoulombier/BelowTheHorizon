@@ -14,7 +14,7 @@ public class Utils
         { "jump", "Jump" },
         { "sprint", "Sprint" },
         { "crouch", "Crouch" },
-        { "grovel", "Grovel" },
+        { "crawl", "Crawl" },
         { "interact", "Interact" },
         { "move_up", "Move up" },
         { "move_down", "Move down" },

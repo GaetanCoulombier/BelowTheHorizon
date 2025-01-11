@@ -6,6 +6,8 @@ public partial class MovementController : Node
     /* --- Nodes --- */
     [Export] private PlayerController _player;
     [Export] private Node3D _head;
+    [Export] private CollisionShape3D _hitbox;
+    [Export] private RayCast3D _headBonker;
 
     /* --- Signals --- */
     [Signal] public delegate void ChangeMovementStateEventHandler(MovementState state);
@@ -20,13 +22,19 @@ public partial class MovementController : Node
     /* --- Movement Variables --- */
     private Vector3 _velocity = Vector3.Zero;
     private Vector3 _direction = Vector3.Zero;
-    private Vector3 _lastInputDirection = Vector3.Zero;
     private float _speed = 0.0f;
+    private float _currentHeight = 2.0f;
+    private float _targetHeight;
+    private bool _isCrouching = false;
+    private bool _isCrawling = false;
+
 
     /* --- Settings --- */
     [Export] private float Gravity = -9.8f;
-    [Export] private float JumpForce = 3.0f;
-    [Export] private float Momentum = 0.98f;
+    [Export] private float JumpForce = 4.0f;
+    [Export] private float AirMomentum = 0.98f;
+    [Export] private float GroundMomentum = 10.0f;
+    [Export] private float SwimMomentum; // TODO : Add the swimming
 
     /* --- Godot Methods --- */
     public override void _Ready()
@@ -36,7 +44,13 @@ public partial class MovementController : Node
 
     public override void _PhysicsProcess(double delta)
     {
-        UpdateMovementState();
+        // Update the player's height for the current movement state (Crouch, Crawl, Swim, etc.)
+        AdaptPlayerHeight();
+        
+        // Update the movement based on the current state
+        UpdateMovement(delta);
+
+        // Apply the velocity to the player and move it
         _player.SetVelocity(_velocity);
         _player.MoveAndSlide();
     }
@@ -56,25 +70,24 @@ public partial class MovementController : Node
         if (Input.IsActionPressed("move_forward")) tempDirection += Vector3.Forward;
         if (Input.IsActionPressed("move_backward")) tempDirection += Vector3.Back;
 
-        if (tempDirection != _lastInputDirection)
-        {
-            _direction = tempDirection;
-            _lastInputDirection = tempDirection;
-        }
+        _direction = tempDirection;
     }
 
-    private void UpdateMovementState()
+    private void UpdateMovement(double delta)
     {
         switch (MovementType)
         {
             case MovementType.GROUND:
-                UpdateGroundMovementState();
-                UpdateGroundMovement(GetProcessDeltaTime());
+                UpdateGroundMovement(delta);
+                break;
+
+            case MovementType.CLIMBING:
+                UpdateClimbMovement(delta);
                 break;
 
             case MovementType.SWIMMING:
                 if (MovementState == null) SetMovementState(MovementState.SWIM);
-                UpdateSwimMovement(GetProcessDeltaTime());
+                UpdateSwimMovement(delta);
                 break;
 
             default:
@@ -83,21 +96,42 @@ public partial class MovementController : Node
         }
     }
 
-    private void UpdateGroundMovementState()
+    private void UpdateGroundMovement(double delta)
     {
         bool isOnFloor = _player.IsOnFloor();
-        bool isCrouching = Input.IsActionPressed("crouch");
+
         bool isSprinting = Input.IsActionPressed("sprint");
         bool isJumping = Input.IsActionJustPressed("jump");
 
-        // Update movement state based on input conditions
-        if (_lastInputDirection == Vector3.Zero)
+        bool isCrouchingPressed = Input.IsActionJustPressed("crouch"); // Use IsActionJustPressed for toggle
+        bool isCrawlingPressed = Input.IsActionJustPressed("crawl");  // Use IsActionJustPressed for toggle
+
+        // Toggle crouch state
+        if (isCrouchingPressed) 
         {
-            SetMovementState(MovementState.IDLE);
+            _isCrouching = !_isCrouching;
+            _isCrawling = false; // Disable crawling if toggling crouch
         }
-        else if (isCrouching)
+
+        // Toggle crawl state
+        if (isCrawlingPressed) 
+        {
+            _isCrawling = !_isCrawling;
+            _isCrouching = false; // Disable crouching if toggling crawl
+        }
+
+        // Update movement state based on toggles
+        if (_isCrawling)
+        {
+            SetMovementState(MovementState.CRAWL);
+        }
+        else if (_isCrouching)
         {
             SetMovementState(MovementState.CROUCH);
+        }
+        else if (_direction == Vector3.Zero)
+        {
+            SetMovementState(MovementState.IDLE);
         }
         else if (isSprinting)
         {
@@ -108,37 +142,48 @@ public partial class MovementController : Node
             SetMovementState(MovementState.WALK);
         }
 
-        // Handle jump and fall
-        if (isJumping && isOnFloor)
-        {
-            _velocity.Y = JumpForce;  // Apply jump force directly to velocity
-            EmitSignal(nameof(Jump));  // Emit the Jump signal
-        }
-        else if (!isOnFloor)
-        {
-            _velocity.Y += Gravity * (float)GetProcessDeltaTime();  // Apply gravity when in the air
-            EmitSignal(nameof(Fall));  // Emit the Fall signal
+        // Handle jumping
+        if (isJumping && isOnFloor) { 
+            _velocity.Y = JumpForce;
+            EmitSignal(nameof(Jump));
         }
 
-        // Call movement update
-        UpdateGroundMovement(GetProcessDeltaTime());
-    }
+        // Handle gravity
+        if (!isOnFloor) {
+            _velocity.Y = Mathf.Lerp(_velocity.Y, Gravity, (float)delta);
+            EmitSignal(nameof(Fall));
+        }
 
-    private void UpdateGroundMovement(double delta)
-    {
+        // If the player is colliding with something above, make it bounce
+        if (_headBonker.IsColliding()) 
+            _velocity.Y = -2;
+
+        // Update the movement based on the current state
         var rotatedDirection = _direction.Normalized().Rotated(Vector3.Up, _head.Rotation.Y);
 
         if (_player.IsOnFloor())
         {
-            _velocity.X = rotatedDirection.X * _speed;
-            _velocity.Z = rotatedDirection.Z * _speed;
+            if (_direction != Vector3.Zero)
+            {
+                // Acceleration based on the direction
+                _velocity.X = Mathf.Lerp(_velocity.X, rotatedDirection.X * _speed, (float)delta * GroundMomentum);
+                _velocity.Z = Mathf.Lerp(_velocity.Z, rotatedDirection.Z * _speed, (float)delta * GroundMomentum);
+            }
+            else
+            {
+                // Deceleration when no input
+                _velocity.X = Mathf.Lerp(_velocity.X, 0, (float)delta * GroundMomentum);
+                _velocity.Z = Mathf.Lerp(_velocity.Z, 0, (float)delta * GroundMomentum);
+            }
         }
         else
         {
-            _velocity.X = Mathf.Lerp(_velocity.X, rotatedDirection.X * _speed, (float)delta * Momentum);
-            _velocity.Z = Mathf.Lerp(_velocity.Z, rotatedDirection.Z * _speed, (float)delta * Momentum);
+            // Air control
+            _velocity.X = Mathf.Lerp(_velocity.X, rotatedDirection.X * _speed, (float)delta * AirMomentum);
+            _velocity.Z = Mathf.Lerp(_velocity.Z, rotatedDirection.Z * _speed, (float)delta * AirMomentum);
         }
     }
+
 
     private void UpdateSwimMovement(double delta)
     {
@@ -150,12 +195,38 @@ public partial class MovementController : Node
         throw new NotImplementedException();
     }
 
+
+
+
+    /* --- Movement Methods --- */
+    public void AdaptPlayerHeight()
+    {
+        if (_targetHeight == _currentHeight) return;
+
+        // Si ça touche, et que c'est en tain de monter, alors on ne change pas la hauteur
+        if (_headBonker.IsColliding() && _targetHeight > _currentHeight) return;
+
+        // Smoothly interpolate the height
+        var currentShape = (CapsuleShape3D)_hitbox.Shape;
+        _currentHeight = Mathf.Lerp(_currentHeight, _targetHeight, (float)(GetProcessDeltaTime() * 10)); // Adjust the speed factor
+        currentShape.Height = _currentHeight;
+    }
+
+
+
+
+
     /* --- Getters & Setters --- */
     public void SetMovementState(MovementState state)
     {
-        if (MovementState == state) return;
+        // The player can't change movement state if it's colliding with something above
+        if (_headBonker.IsColliding() && state.playerHeight > _currentHeight) return;
+
         MovementState = state;
+        _targetHeight = state.playerHeight;
         _speed = state.speed;  // Update speed directly in the setter
+
+
         EmitSignal(nameof(ChangeMovementState), state);  // Emit the ChangeMovementState signal
     }
 
@@ -165,21 +236,5 @@ public partial class MovementController : Node
         MovementState = null;  // Reset movement state on type change
         MovementType = type;
         EmitSignal(nameof(ChangeMovementType));  // Emit the ChangeMovementType signal
-    }
-
-    /* --- Signal Handlers --- */
-    public void OnChangeMovementState(MovementState movementState)
-    {
-        _speed = movementState.speed;
-    }
-
-    public void OnJump()
-    {
-        _velocity.Y = JumpForce;  // This is now handled directly in UpdateGroundMovementState
-    }
-
-    public void OnFall()
-    {
-        _velocity.Y += Gravity * (float)GetProcessDeltaTime();  // This is now handled directly in UpdateGroundMovementState
     }
 }

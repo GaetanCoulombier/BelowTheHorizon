@@ -36,14 +36,15 @@ environment = SubResource("Environment_cma6l")
 script = ExtResource("1_71guo")
 
 [node name="PlayerController" parent="." instance=ExtResource("3_2eokk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2067, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.07462, 0)
 
 [node name="Environment" type="Node3D" parent="."]
 
 [node name="ClimbingAxe" parent="Environment" instance=ExtResource("6_o0bnv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2852, 1.26339, 0)
 
 [node name="Sol" type="MeshInstance3D" parent="Environment"]
-transform = Transform3D(24.697, 0, 0, 0, 0.449246, 0, 0, 0, 24.697, 0, 0, 0)
+transform = Transform3D(24.697, 0, 0, 0, 0.449246, 0, 0, 0, 44.0116, 0, 0, 0)
 layers = 17
 mesh = SubResource("BoxMesh_mklb8")
 skeleton = NodePath("../..")
@@ -216,4 +217,48 @@ skeleton = NodePath("../..")
 [node name="StaticBody3D" type="StaticBody3D" parent="Environment/Mur15"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Mur15/StaticBody3D"]
+shape = SubResource("BoxShape3D_padwm")
+
+[node name="Mur16" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(2.07023, 0, 0, 0, 3.28794, 0.991102, 0, -1.34976, 2.41427, -2.61064, 3.18443, 7.54176)
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Mur16"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Mur16/StaticBody3D"]
+shape = SubResource("BoxShape3D_padwm")
+
+[node name="Mur17" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(2.07023, 0, 0, 0, 3.2206, -3.06859, 0, 1.50337, 6.57373, 1.68308, 3.16617, 15.1318)
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Mur17"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Mur17/StaticBody3D"]
+shape = SubResource("BoxShape3D_padwm")
+
+[node name="Mur18" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(2.07023, 0, 0, 0, 3.55421, 0, 0, 0, 7.25467, 7.76217, 3.31046, 13.5778)
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Mur18"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Mur18/StaticBody3D"]
+shape = SubResource("BoxShape3D_padwm")
+
+[node name="Mur19" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(2.07023, 0, 0, 0, 3.55421, 0, 0, 0, 7.25467, 9.61906, 2.66751, 13.5778)
+layers = 17
+mesh = SubResource("BoxMesh_mklb8")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Mur19"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Mur19/StaticBody3D"]
 shape = SubResource("BoxShape3D_padwm")

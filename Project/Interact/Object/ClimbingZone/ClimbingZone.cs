@@ -1,9 +1,16 @@
 using Godot;
+using BelowTheHorizon;
 
-public partial class BTHButton : BTHInteractable
+public partial class ClimbingZone : Object
 {
 	public override void Interact(PlayerController player)
 	{
-		GD.Print($"Pressing {Name}");
+		// Implement the climbing logic here
+	}
+
+	public override bool CanInteract(PlayerController player)
+	{
+		// Implement the climbing logic here
+		return true;
 	}
 }

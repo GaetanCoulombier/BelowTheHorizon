@@ -1,4 +1,5 @@
 using Godot;
+using BelowTheHorizon;
 
 // Handle every interactions that the player can do with the environment (with hands and tools)
 public partial class InteractionController : RayCast3D
@@ -24,14 +25,23 @@ public partial class InteractionController : RayCast3D
         if (IsColliding())
         {
             var collidingObject = GetCollider();
-            if (collidingObject is BTHInteractable interactable)
+            if (collidingObject is Interactable interactable)
             {
-                // Show interactable action on the screen
-                _uiInteractPrompt.Visible = true;
-                prompt.Text = interactable.GetPromptMessage();
+                if (interactable.CanInteract(_player))
+                {
+                    // Show interactable action on the screen
+                    _uiInteractPrompt.Visible = true;
+                    prompt.Text = interactable.GetPromptMessage();
 
-                if (Input.IsActionJustPressed(interactable.GetInteractAction()))
-                    interactable.Interact(_player);
+                    if (Input.IsActionJustPressed(interactable.GetInteractAction()))
+                    {
+                        interactable.Interact(_player);
+                    }
+                }else{
+                    // Show interactable action on the screen
+                    _uiInteractPrompt.Visible = true;
+                    prompt.Text = interactable.GetPromptErrorMessage();
+                }
                 return;
             }
         }

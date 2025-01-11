@@ -7,7 +7,6 @@ public partial class CameraController : Camera3D
 	[Export] private PlayerController _player;
 	[Export] private MovementController _movementController;
 	[Export] private Node3D _head;
-	private Tween tween;
 
 	/* Settings */
     private const float SENSITIVITY = 0.1f; // TODO : Add this to the settings menu
@@ -15,9 +14,13 @@ public partial class CameraController : Camera3D
 	private float BASE_FOV = 60;
 
 	/* Head bobbing */
-	private const float BOB_AMP = 0.1f;
-	private const float BOB_FREQ = 2.0f;
+	private const float BOB_AMP = 0.05f;
+	private const float BOB_FREQ = 3.0f;
 	private float _bobTime = 0.0f;
+	private Tween tweenBob;
+	
+	/* Head height */
+	private Tween tweenHeadHeight;
 
 	/* Godot methods */
 	public override void _Ready()
@@ -64,12 +67,12 @@ public partial class CameraController : Camera3D
     }
 
 	/* Signals */
-	public void OnChangeMovementState(MovementState movementState)
+	public void OnChangeMovementState(MovementState state)
     {
-		tween?.Kill();
-
-		tween = CreateTween();
-		var newFov = movementState.added_fov + BASE_FOV;
-		tween.TweenProperty(this, "fov", newFov, 0.3f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
-    }
+		// FOV
+		tweenBob?.Kill();
+		tweenBob = CreateTween();
+		var newFov = state.addedFov + BASE_FOV;
+		tweenBob.TweenProperty(this, "fov", newFov, 0.3f).SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.Out);
+	}
 }

@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://btqa5jckcn3pl"]
 
-[ext_resource type="Script" path="res://Project/UserInterfaces/SlotContainer/Inventory/Inventory.cs" id="1_lyvq6"]
+[ext_resource type="Script" path="res://Project/UserInterfaces/SlotContainer/Inventory/Inventory.cs" id="1_jx4i7"]
 [ext_resource type="PackedScene" uid="uid://bb6knpwe35xv3" path="res://Project/UserInterfaces/SlotContainer/Slot.tscn" id="1_t1doq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g5fw8"]
@@ -24,7 +24,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_lyvq6")
+script = ExtResource("1_jx4i7")
 _gridContainer = NodePath("Panel/MarginContainer/InventorySlotsGrid")
 
 [node name="Panel" type="Panel" parent="."]

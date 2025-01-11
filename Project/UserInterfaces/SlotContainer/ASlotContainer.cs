@@ -1,5 +1,6 @@
 using Godot;
 using System.Linq;
+using BelowTheHorizon;
 
 public abstract partial class ASlotContainer : Control
 {
@@ -54,7 +55,7 @@ public abstract partial class ASlotContainer : Control
         return _slots;
     }
 
-    public bool SetSlot(int index, BTHItem item)
+    public bool SetSlot(int index, Item item)
     {
         if (index < 0 || index >= _slots.Length)
             return false;
@@ -72,6 +73,66 @@ public abstract partial class ASlotContainer : Control
     {
         return _player;
     }
+
+
+
+
+
+    /* Item management in inventory slots */
+    public void AddItem(Item item)
+    {
+        if (!CanAddItem(item))
+            return;
+
+        var slot = GetFirstEmptySlot();
+        slot.SetItem(item);
+    }
+
+    public bool CanAddItem(Item item)
+    {
+        var slot = GetFirstEmptySlot();
+
+        if (slot == null)
+            return false;
+
+        return slot.IsEmpty();
+    }
+
+    public void SwitchFirst(Slot swappedSlot)
+    {
+        var firstSlot = GetFirstEmptySlot();
+        firstSlot.SwapWith(swappedSlot);
+    }
+
+    private Slot GetFirstEmptySlot()
+    {
+        foreach (var slot in _slots)
+        {
+            if (slot.IsEmpty())
+                return slot;
+        }
+
+        return null;
+    }
+
+    // Trim the empty slots to the end of the array
+    public void ReorderSlots()
+    {
+        int emptyIndex = 0;
+
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (!_slots[i].IsEmpty())
+            {
+                if (i != emptyIndex)
+                {
+                    _slots[emptyIndex].SwapWith(_slots[i]);
+                }
+                emptyIndex++;
+            }
+        }
+    }
+
 
 
 

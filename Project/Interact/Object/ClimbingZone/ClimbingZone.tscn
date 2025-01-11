@@ -1,6 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bhr4uyrbruhks"]
-
-[ext_resource type="Script" path="res://Project/Interact/Object/Button/Button.cs" id="1_ux273"]
+[gd_scene load_steps=3 format=3 uid="uid://bhr4uyrbruhks"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_thoy7"]
 
@@ -9,8 +7,6 @@
 [node name="ClimbingZone" type="StaticBody3D"]
 collision_layer = 3
 collision_mask = 0
-script = ExtResource("1_ux273")
-messagePrompt = "climb"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_thoy7")

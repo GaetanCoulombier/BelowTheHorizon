@@ -11,16 +11,20 @@
 [ext_resource type="PackedScene" uid="uid://dl6irgcvodwx7" path="res://Project/UserInterfaces/PauseMenu/InputSettings.tscn" id="9_drwoq"]
 [ext_resource type="Script" path="res://Project/Player/InteractionController.cs" id="18_i4cpv"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4haau"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mr757"]
+radius = 0.4
+height = 1.7
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_nsouh"]
+radius = 0.4
+height = 1.7
 
 [node name="PlayerController" type="CharacterBody3D" node_paths=PackedStringArray("_inventory")]
 script = ExtResource("1_ta7j4")
 _inventory = NodePath("GUI/Inventory")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_4haau")
+shape = SubResource("CapsuleShape3D_mr757")
 
 [node name="Mesh" type="Node3D" parent="."]
 
@@ -29,7 +33,7 @@ mesh = SubResource("CapsuleMesh_nsouh")
 skeleton = NodePath("../..")
 
 [node name="Head" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head" node_paths=PackedStringArray("_player", "_movementController", "_head")]
 script = ExtResource("1_un8fh")
@@ -45,13 +49,20 @@ _quickAccessBar = NodePath("../../../GUI/HUD/QuickAccessBar")
 _player = NodePath("../../..")
 _uiInteractPrompt = NodePath("../../../GUI/HUD/InteractionPrompt")
 
-[node name="MovementController" type="Node" parent="." node_paths=PackedStringArray("_player", "_head")]
+[node name="HeadBoncker" type="RayCast3D" parent="."]
+target_position = Vector3(0, 1, 0)
+debug_shape_custom_color = Color(0, 0.00784314, 0.00784314, 1)
+
+[node name="MovementController" type="Node" parent="." node_paths=PackedStringArray("_player", "_head", "_hitbox", "_headBonker")]
 script = ExtResource("3_ttf83")
 _player = NodePath("..")
 _head = NodePath("../Head")
+_hitbox = NodePath("../CollisionShape3D")
+_headBonker = NodePath("../HeadBoncker")
 
-[node name="UserInterfaceController" type="Node" parent="." node_paths=PackedStringArray("_uiHUD", "_crosshair", "_uiInteractPrompt", "_uiQuickAccessBar", "_uiInventory", "_uiPauseMenu")]
+[node name="UserInterfaceController" type="Node" parent="." node_paths=PackedStringArray("_player", "_uiHUD", "_crosshair", "_uiInteractPrompt", "_uiQuickAccessBar", "_uiInventory", "_uiPauseMenu")]
 script = ExtResource("6_kc6md")
+_player = NodePath("..")
 _uiHUD = NodePath("../GUI/HUD")
 _crosshair = NodePath("../GUI/HUD/Crosshair")
 _uiInteractPrompt = NodePath("../GUI/HUD/InteractionPrompt")

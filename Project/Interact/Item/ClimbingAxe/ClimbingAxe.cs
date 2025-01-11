@@ -1,6 +1,7 @@
 using Godot;
+using BelowTheHorizon;
 
-public partial class IceAxe : BTHItem
+public partial class ClimbingAxe : Item
 {
     public override void UsePrimary(PlayerController player)
     {

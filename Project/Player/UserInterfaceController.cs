@@ -5,6 +5,7 @@ using Godot;
 public partial class UserInterfaceController : Node
 {
     /* Nodes */
+    [Export] private PlayerController _player;
     [Export] private Control _uiHUD;
     [Export] private Control _crosshair;
     [Export] private Control _uiInteractPrompt;
@@ -14,7 +15,8 @@ public partial class UserInterfaceController : Node
     [Export] private Control _mainMenu; // Not implemented yet
 
     /* Variables */
-    private ASlotContainer _currentSlotContainer = null;
+    private ASlotContainer _currentInteractInventory = null;
+    private ASlotContainer _currentOpennedInventory = null;
 
 
     /* Godot methods */
@@ -32,8 +34,8 @@ public partial class UserInterfaceController : Node
         _uiQuickAccessBar.Visible = true;
 
         // Connect signals
-        _uiInventory.Connect(nameof(ASlotContainer.SetCurrentInventory), new Callable(this, nameof(OnSetCurrentInventory)));
-        _uiQuickAccessBar.Connect(nameof(ASlotContainer.SetCurrentInventory), new Callable(this, nameof(OnSetCurrentInventory)));
+        _uiInventory.Connect(nameof(ASlotContainer.SetCurrentInventory), new Callable(this, nameof(OnSetCurrentInteractInventory)));
+        _uiQuickAccessBar.Connect(nameof(ASlotContainer.SetCurrentInventory), new Callable(this, nameof(OnSetCurrentInteractInventory)));
     }
 
     public override void _Process(double delta)
@@ -56,7 +58,7 @@ public partial class UserInterfaceController : Node
 
 
     /* Open menus methods */
-    private void ToggleInventory(Control inventory)
+    private void ToggleInventory(ASlotContainer inventory)
     {
         _uiInventory.Visible = !_uiInventory.Visible;
         GameState.SetMouseMode(_uiInventory.Visible);
@@ -66,6 +68,9 @@ public partial class UserInterfaceController : Node
         _uiPauseMenu.Visible = false;
         _crosshair.Visible = !_uiInventory.Visible;
         _uiInteractPrompt.Visible = !_uiInventory.Visible;
+
+        // Visible inventory
+        _currentOpennedInventory = inventory;
 
         GameState.SetInventoryOpen(_uiInventory.Visible);
     }
@@ -95,7 +100,7 @@ public partial class UserInterfaceController : Node
         if (!GameState.isInventoryOpen)
             return;
 
-        var currentSlot = _currentSlotContainer?.GetCurrentSlot();
+        var currentSlot = _currentInteractInventory?.GetCurrentSlot();
 
         if (currentSlot == null)
             return;
@@ -103,13 +108,22 @@ public partial class UserInterfaceController : Node
         // Mouse input
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
+            
+            // Move item to the opposite inventory
             if (mouseEvent.ButtonIndex == MouseButton.Left)
             {
-                GD.Print("Use item");
+                if (_currentInteractInventory is QuickAccessBar) {
+                    _currentOpennedInventory.SwitchFirst(currentSlot);
+                    _currentOpennedInventory.ReorderSlots();
+                } else {
+                    _uiQuickAccessBar.SwitchFirst(currentSlot);
+                }
             }
+
+            // Use the item
             if (mouseEvent.ButtonIndex == MouseButton.Right)
             {
-                GD.Print("Move item to another inventory (chest for example)");
+                currentSlot.GetItem().UseSecondary(_player);
             }
         }
 
@@ -139,9 +153,9 @@ public partial class UserInterfaceController : Node
 
 
     /* Signals */
-    private void OnSetCurrentInventory()
+    private void OnSetCurrentInteractInventory()
     {
         // Update the current slot container
-        _currentSlotContainer = ASlotContainer.currentInventory;
+        _currentInteractInventory = ASlotContainer.currentInventory;
     }
 }

@@ -11,8 +11,8 @@ radius = 0.998497
 [node name="ClimbingAxe" type="RigidBody3D"]
 collision_layer = 3
 script = ExtResource("1_8vn5t")
-_icon = ExtResource("2_ho3kr")
 messagePrompt = "pick up"
+_icon = ExtResource("2_ho3kr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_mycu1")

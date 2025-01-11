@@ -1,7 +1,7 @@
-using System;
 using Godot;
+using BelowTheHorizon;
 
-public partial class Slot : Button
+public partial class Slot : Godot.Button
 {
     /* Signals */
     [Signal] public delegate void MouseHoverEventHandler(int slotID);
@@ -11,7 +11,7 @@ public partial class Slot : Button
     public int slotID {get; private set;} = -1;
 
     // Set when the slot is added to a container (chest, inventory, quick access bar)
-    private BTHItem _item = null;
+    private Item _item = null;
     private ASlotContainer slotContainer = null;
 
 
@@ -36,7 +36,7 @@ public partial class Slot : Button
     {
         return slotID;
     }
-    public BTHItem GetItem()
+    public Item GetItem()
     {
         return _item;
     }
@@ -50,12 +50,12 @@ public partial class Slot : Button
 
 
     /* Ckeckers */
-    public bool CanTakeItem(BTHItem item)
+    public bool CanTakeItem(Item item)
     {
         return IsEmpty() || IsItem(item);
     }
 
-    public bool IsItem(BTHItem item)
+    public bool IsItem(Item item)
     {
         return _item == item;
     }
@@ -72,13 +72,13 @@ public partial class Slot : Button
     /* Item management */
     public void SwapWith(Slot swappedSlot)
     {
-        BTHItem tempItem = swappedSlot.GetItem();
+        Item tempItem = swappedSlot.GetItem();
 
         swappedSlot.SetItem(_item);
         SetItem(tempItem);
     }
 
-    public void SetItem(BTHItem item)
+    public void SetItem(Item item)
     {
         _item = item;
         _icon.Texture = item?.GetIcon();
